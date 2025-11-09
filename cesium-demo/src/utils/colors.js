@@ -1,5 +1,14 @@
 import * as Cesium from "cesium";
 
+export function convertColor(colorCode) {
+  if (colorCode === "red") {
+    return "#cc4444";
+  } else if (colorCode === "yellow") {
+    return "#ffd966";
+  }
+  return undefined;
+}
+
 export function getBuildingColor(building, buildingColour, height) {
         // Màu thân nhà theo loại
         let color = "#999999"; // mặc định
