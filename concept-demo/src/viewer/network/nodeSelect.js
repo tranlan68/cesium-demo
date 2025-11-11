@@ -31,10 +31,12 @@ export function enableNodeSelection(viewer) {
           // Tạo drone tại điểm bắt đầu
           console.log("nodeMap:", nodeMap);
           console.log("selectedNodes:", selectedNodes[0]);
-          const drone = createDrone(viewer, nodeMap[selectedNodes[0]], nodeMap);
+          const drone = createDrone(viewer, '/assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 15);
+          // Drone bay theo đường đi
+          let startScenarioTime = Date.now()
           // Drone bay theo đường đi
           openDroneWindow(viewer, drone);
-          animateDroneAlongPath(viewer, drone, waypoints);
+          animateDroneAlongPath(viewer, drone, waypoints, Cesium.Color.RED, 15, 15);
 
           const totalTime = waypoints.length; // mỗi waypoint = 1s
           const start = viewer.clock.currentTime;
@@ -74,7 +76,7 @@ export function enableNodeSelection(viewer) {
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
-export async function startScenario(viewer) {
+export async function startScenario(viewer, timerDisplay) {
   let selectedNodes = ["VMC", "TTTC"];
   const { nodes, nodeMap, routes } = window.__network;
 
@@ -83,13 +85,10 @@ export async function startScenario(viewer) {
   if (waypoints.length > 1) {
     const reverseWaypoints = waypoints.slice().reverse();
     // Tạo drone tại điểm bắt đầu
-    const droneA = createDrone(viewer, nodeMap[selectedNodes[0]], nodeMap, 15);
-    animateDroneAlongPath(viewer, droneA, waypoints, 15);
-
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    // Tạo drone tại điểm bắt đầu
-    const droneB = createDrone(viewer, nodeMap[selectedNodes[1]], nodeMap, 35);
-    animateDroneAlongPath(viewer, droneB, reverseWaypoints, 35);
+    const droneA = createDrone(viewer, '/assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 15);
+    let startScenarioTime = Date.now()
+    animateDroneAlongPath(viewer, droneA, waypoints, Cesium.Color.RED, 15, 15);
+    let droneB = undefined;
 
     // Cập nhật mỗi frame
     let collisionWarning = createCollisionWarning(viewer);
@@ -111,7 +110,19 @@ export async function startScenario(viewer) {
           }
         }
       }
+      if (!positionDroneA && !positionDroneB) {
+        timerDisplay.textContent = "Hoàn thành";
+      } else {
+        const elapsed = ((Date.now() - startScenarioTime) / 1000).toFixed(0);
+        timerDisplay.textContent = `Thời gian: ${elapsed}s`;
+        console.log("Khoảng cách:", timerDisplay.textContent);
+      }
     });
+
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Tạo drone tại điểm bắt đầu
+    droneB = createDrone(viewer, '/assets/models/drone2.glb', Cesium.Color.PURPLE, nodeMap[selectedNodes[1]], nodeMap, 35);
+    animateDroneAlongPath(viewer, droneB, reverseWaypoints, Cesium.Color.PURPLE, 15, 35);
   } else {
     console.warn("⚠️ Không tìm thấy đường đi giữa", start, "và", end);
   }
@@ -181,6 +192,7 @@ function getElevatedPosition(cartesian, heightOffset = 50) {
 
 
 function getDronePosition(viewer, drone) {
+  if (!drone) return undefined;
   const dronePositionProperty = drone.position;
 
   // Lấy thời điểm hiện tại (hoặc bất kỳ thời điểm nào)

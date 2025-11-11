@@ -47,11 +47,11 @@ export function getBuildingColor(building, buildingColour, height) {
   }
 
 export function getWaterColor() {
-    return "#3399ff";
+    return "#305377ff";
 }
 
 export function getParkColor() {
-    return "#66cc66";
+    return "#1a4e1aff";
 }
 
 export function getHighwayColor(highway) {

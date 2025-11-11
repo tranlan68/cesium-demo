@@ -65,7 +65,7 @@ function drawRoutes(viewer, routes) {
       polylineVolume: {
         positions,
         shape: createCircleShape(25),
-        material: Cesium.Color.CYAN.withAlpha(0.2),
+        material: Cesium.Color.CYAN.withAlpha(0.15),
       },
     });
 

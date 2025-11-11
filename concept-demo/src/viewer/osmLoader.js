@@ -8,8 +8,8 @@ export async function loadOsmData(viewer, url) {
   const geojson = osmtogeojson(osmData);
 
   const dataSource = await Cesium.GeoJsonDataSource.load(geojson, {
-    stroke: Cesium.Color.WHITE,
-    fill: Cesium.Color.WHITE.withAlpha(0.4),
+    stroke: Cesium.Color.DIMGREY,
+    fill: Cesium.Color.DIMGREY.withAlpha(0.4),
     clampToGround: true,
   });
 

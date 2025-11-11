@@ -18,7 +18,7 @@ function generateDroneId() {
  * @param {Object} startNode - node có {id, lat, lng, alt}
  * @param {Object} nodeMap - danh sách node theo id
  */
-export function createDrone(viewer, startNode, nodeMap, offsetAlt) {
+export function createDrone(viewer, uri, textColor, startNode, nodeMap, offsetAlt) {
   if (!startNode || !startNode.id) {
     console.warn("⚠️ createDrone: startNode không hợp lệ", startNode);
     return null;
@@ -39,7 +39,9 @@ export function createDrone(viewer, startNode, nodeMap, offsetAlt) {
   }
 
   const position = Cesium.Cartesian3.fromDegrees(n.lng, n.lat, (n.alt ?? 0) + 5);
-
+  const carto = Cesium.Cartographic.fromCartesian(position);
+  const altitude = carto.height.toFixed(1);
+  
   const entity = viewer.entities.add({
     id: droneId,
     name: `Drone ${droneId}`,
@@ -51,7 +53,7 @@ export function createDrone(viewer, startNode, nodeMap, offsetAlt) {
     //   outlineColor: Cesium.Color.WHITE,
     // },
     model: {
-        uri: '/assets/models/drone1.glb',
+        uri: uri,
         minimumPixelSize: 60,
         maximumScale: 100,
         runAnimations: true,
@@ -60,15 +62,40 @@ export function createDrone(viewer, startNode, nodeMap, offsetAlt) {
     orientation: new Cesium.VelocityOrientationProperty(
       new Cesium.SampledPositionProperty()
     ),
+    
     // label: {
-    //   text: `UAV-${droneCounter}`,
+    //   text: new Cesium.CallbackProperty(function(time) {
+    //     console.error("time-time: ", time)
+    //     const position = drone.position.getValue(time);
+    //     if (!position) return "";
+    //     const carto = Cesium.Cartographic.fromCartesian(position);
+    //     const altitude = carto.height.toFixed(2);
+    //     return `Độ cao ${altitude} m`;
+    //   }),
     //   font: '10px sans-serif',
-    //   fillColor: Cesium.Color.WHITE,
+    //   fillColor: Cesium.Color.RED,
     //   pixelOffset: new Cesium.Cartesian2(0, -15),
     //   disableDepthTestDistance: Number.POSITIVE_INFINITY,
     // },
+    label: {
+      text: `Độ cao ${altitude} m`,
+      font: 'bold 16px sans-serif',
+      fillColor: textColor,
+      pixelOffset: new Cesium.Cartesian2(0, -15),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    },
     properties: { type: "drone" }
   });
+  entity.label.text = new Cesium.CallbackProperty((time) => {
+        const pos = entity?.position?.getValue(time);
+        if (!pos) return "";
+        const carto = Cesium.Cartographic.fromCartesian(pos);
+        const alt = carto.height.toFixed(1);
+        if (alt > 85) {
+          return `Độ cao ${alt -25} m`;
+        }
+        return `Độ cao ${alt} m`;
+      }, false);
   drones.set(droneId, entity);
 
   console.log("🚁 Drone created at", startNode.id);
@@ -95,7 +122,8 @@ export function removeDrone(viewer, droneId) {
 /**
  * Di chuyển drone dọc theo đường đi (path)
  */
-export function animateDroneAlongPath(viewer, drone, waypoints, offsetAlt) {
+export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt, offsetAlt2) {
+  const changeTime = 37;
   if (!drone || !waypoints ||  waypoints.length === 0) {
     console.warn("⚠️ animateDroneAlongPath: Drone hoặc path không hợp lệ");
     return;
@@ -115,17 +143,47 @@ export function animateDroneAlongPath(viewer, drone, waypoints, offsetAlt) {
   //   },
   // });
 
+  const offsetArray = [];
+
   for (let i = 0; i < waypoints.length; i++) {
     const wp = waypoints[i];
-    const position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt);
-    const time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
-    property.addSample(time, position);
-    t += 1;
-    //highlightedPositions.push(position);
+    
+    if (i < changeTime) {
+      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      const position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt + offsetArray[i]);
+      const time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+      property.addSample(time, position);
+      t += 1;
+      //highlightedPositions.push(position);
+    } else if (i === changeTime) {
+      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      const position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt + offsetArray[i]);
+      const time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+      property.addSample(time, position);
+      t += 1;
+
+      const position2 = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt2 + offsetArray[i]);
+      const time2 = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+      property.addSample(time2, position2);
+      t += 1;
+
+    } else {
+      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      const position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt2 + offsetArray[i]);
+      const time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+      property.addSample(time, position);
+      t += 1;
+      //highlightedPositions.push(position);
+    }
   }
 
   drone.position = property;
-  drone.orientation = new Cesium.VelocityOrientationProperty(property);
+  //drone.orientation = new Cesium.VelocityOrientationProperty(property);
+  drone.orientation = new Cesium.CallbackPositionProperty(function(time, result) {
+    const position = drone.position.getValue(time);
+    const heading = 0;
+    return Cesium.Transforms.headingPitchRollQuaternion(position, new Cesium.HeadingPitchRoll(heading, 0, 0));
+  }, false);
 
   viewer.clock.startTime = start.clone();
   viewer.clock.stopTime = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
@@ -185,9 +243,22 @@ export function animateDroneAlongPath(viewer, drone, waypoints, offsetAlt) {
         for (let i = 0; i < waypoints.length; i++) {
           const t = Cesium.JulianDate.addSeconds(start, i, new Cesium.JulianDate());
           if (Cesium.JulianDate.lessThanOrEquals(t, currentTime)) {
-            positions.push(Cesium.Cartesian3.fromDegrees(
-              waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + offsetAlt
-            ));
+            if (i < changeTime) {
+              positions.push(Cesium.Cartesian3.fromDegrees(
+                waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + offsetAlt + offsetArray[i]
+              ));
+            } else if (i === changeTime) {
+              positions.push(Cesium.Cartesian3.fromDegrees(
+                waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + offsetAlt + offsetArray[i]
+              ));
+              positions.push(Cesium.Cartesian3.fromDegrees(
+                waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + offsetAlt2 + offsetArray[i]
+              ));
+            } else {
+              positions.push(Cesium.Cartesian3.fromDegrees(
+                waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + offsetAlt2 + offsetArray[i]
+              ));
+            }
           } else {
             break;
           }
@@ -195,7 +266,7 @@ export function animateDroneAlongPath(viewer, drone, waypoints, offsetAlt) {
         return positions;
       }, false),
       shape: createCircleShape(1),
-      material: Cesium.Color.RED.withAlpha(0.9),
+      material: color.withAlpha(0.9),
     }
   });
 }
