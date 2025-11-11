@@ -53,7 +53,8 @@ export function initViewer(containerId) {
     // Cho phép xoay, nghiêng, zoom tự do
     const controller = viewer.scene.screenSpaceCameraController;
     controller.enableRotate = true;         // Cho phép xoay ngang
-    controller.enableTilt = true;           // Cho phép nghiêng
+    //controller.enableTranslate = true;     
+    controller.enableTilt = false;           // Cho phép nghiêng
     controller.enableZoom = true;           // Cho phép zoom
     controller.enableLook = true;           // Cho phép "nhìn quanh" bằng chuột phải
     controller.minimumZoomDistance = 1.0;   // Không giới hạn zoom gần
@@ -110,14 +111,22 @@ export function initViewer(containerId) {
         const heading = Cesium.Math.toDegrees(viewer.camera.heading);
         const pitch = Cesium.Math.toDegrees(viewer.camera.pitch);
         const roll = Cesium.Math.toDegrees(viewer.camera.roll);
-        console.log("lon: ", lon);
-        console.log("lat: ", lat);
-        console.log("height: ", height);
-        console.log("heading: ", heading);
-        console.log("pitch: ", pitch);
-        console.log("roll: ", roll);
-
+        console.log(`lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}, roll: ${roll}`);
     });
+
+    // const minHeight = 50; // độ cao tối thiểu (mét so với ellipsoid)
+
+    // viewer.camera.changed.addEventListener(function () {
+    //     const carto = Cesium.Ellipsoid.WGS84.cartesianToCartographic(viewer.camera.position);
+    //     const height = carto.height;
+
+    //     if (height < minHeight) {
+    //         // Đặt lại camera ở độ cao tối thiểu
+    //         carto.height = minHeight;
+    //         const newPos = Cesium.Ellipsoid.WGS84.cartographicToCartesian(carto);
+    //         viewer.camera.position = newPos;
+    //     }
+    // });
 
     return viewer;
 }

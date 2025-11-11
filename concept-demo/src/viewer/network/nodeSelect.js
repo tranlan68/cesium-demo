@@ -160,7 +160,7 @@ function createCollisionWarning(viewer) {
 }
 
 function showCollisionWarning(viewer, warningEntity, midPos) {
-  warningEntity.position = getElevatedPosition(midPos, 15);  // cập nhật vị trí
+  warningEntity.position = getElevatedPosition(midPos, 20);  // cập nhật vị trí
   warningEntity.show = true;        // hiển thị
 
   let blinkSpeed = 2.0;

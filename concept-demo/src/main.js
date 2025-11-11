@@ -51,7 +51,7 @@ function showNotification() {
           - Drone A: Bay từ VMC tới TTTC <br>
           - Drone B: Bay từ TTTC tới VMC <br>
           - Drone B xuất phát sau Drone A 5s <br>
-          - Khoảng cách từ VMC tới TTTC là: ~860m <br>
+          - Khoảng cách từ VMC tới TTTC: ~860m <br>
       </div>
       <button id="closeToast" style="
         position: absolute;
