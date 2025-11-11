@@ -58,7 +58,7 @@ export function initViewer(containerId) {
     controller.enableLook = true;           // Cho phép "nhìn quanh" bằng chuột phải
     controller.minimumZoomDistance = 1.0;   // Không giới hạn zoom gần
     controller.maximumZoomDistance = 1e9;   // Không giới hạn zoom xa
-    controller.minimumPitch = Cesium.Math.toRadians(-90); // Cho phép nhìn từ dưới lên
+    controller.minimumPitch = Cesium.Math.toRadians(0); // Cho phép nhìn từ dưới lên
     controller.maximumPitch = Cesium.Math.toRadians(90);  // Cho phép nhìn từ trên xuống
 
     // 🚫 Ẩn dòng chữ “Cesium ion” ở góc phải
@@ -66,7 +66,7 @@ export function initViewer(containerId) {
 
 
     // Bắt sự kiện click chuột trái
-    const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    //const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 
     // handler.setInputAction(function (click) {
     //     // Lấy vị trí click trong không gian 3D
@@ -99,6 +99,25 @@ export function initViewer(containerId) {
     //         });
     //     }
     // }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    viewer.scene.preRender.addEventListener(() => {
+        const pos = viewer.camera.position;
+        const carto = Cesium.Cartographic.fromCartesian(pos);
+        const lon = Cesium.Math.toDegrees(carto.longitude);
+        const lat = Cesium.Math.toDegrees(carto.latitude);
+        const height = carto.height;
+
+        const heading = Cesium.Math.toDegrees(viewer.camera.heading);
+        const pitch = Cesium.Math.toDegrees(viewer.camera.pitch);
+        const roll = Cesium.Math.toDegrees(viewer.camera.roll);
+        console.log("lon: ", lon);
+        console.log("lat: ", lat);
+        console.log("height: ", height);
+        console.log("heading: ", heading);
+        console.log("pitch: ", pitch);
+        console.log("roll: ", roll);
+
+    });
 
     return viewer;
 }

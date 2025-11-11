@@ -116,13 +116,31 @@ export async function loadOsmData(viewer, url) {
   });
 
   viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(105.532990, 20.993363, 550),
+    destination: Cesium.Cartesian3.fromDegrees(105.53342318412915, 20.994101238379113, 260),
     orientation: {
-      heading: Cesium.Math.toRadians(0.0),
-      pitch: Cesium.Math.toRadians(-20.0),
-      roll: 0.0
+      heading: Cesium.Math.toRadians(0.33682039563390415),
+      pitch: Cesium.Math.toRadians(-10.493338218153408),
+      roll: 0.0014834891349461406
     }
   });
-
   //viewer.flyTo(dataSource);
+  viewer.camera.setView({
+    destination: Cesium.Cartesian3.fromDegrees(105.53342318412915, 20.994101238379113, 260),
+    orientation: {
+      heading: Cesium.Math.toRadians(0.33682039563390415),
+      pitch: Cesium.Math.toRadians(-10.493338218153408),
+      roll: 0.0014834891349461406,
+    },
+  });
+
+  // const controller = viewer.scene.screenSpaceCameraController;
+  // controller.enableRotate = false;
+  // controller.enableTranslate = false;
+  // controller.enableZoom = true;
+  // controller.enableTilt = true;
+  // controller.enableLook = false;
+  
+  // controller.minimumPitch = Cesium.Math.toRadians(-45);
+  // controller.maximumPitch = Cesium.Math.toRadians(0);
+  // controller.constrainedAxis = Cesium.Cartesian3.UNIT_Z;
 }
