@@ -35,7 +35,7 @@ export function initViewer(containerId) {
 
     // const layer = viewer.imageryLayers.addImageryProvider(
     //     new Cesium.UrlTemplateImageryProvider({
-    //         url: 'http://127.0.0.1:8080/datas/satellite/{z}/{x}/{y}.jpeg',
+    //         url: './assets/alert.png',
     //         minimumLevel: 0,
     //         maximumLevel: 22
     //     })

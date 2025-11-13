@@ -3,6 +3,7 @@ import "cesium/Build/Cesium/Widgets/widgets.css";
 import { initViewer } from "./viewer/initViewer.js";
 import { loadOsmData } from "./viewer/osmLoader.js";
 import { drawNetwork } from "./viewer/network/drawNetwork.js";
+import { updateTracks } from "./viewer/track/trackManager.js"
 import { enableNodeSelection , startScenario} from "./viewer/network/nodeSelect.js";
 import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css'
@@ -27,15 +28,18 @@ drawNetwork(viewer, "./assets/maps/flight_paths_detailed_3.json", 50).then(() =>
   console.log("Network loaded ✅ Click 2 nodes to draw shortest path.");
 });
 
-showNotification();
+updateTracks(viewer);
+setInterval(() => updateTracks(viewer), 10000);
 
-// Lấy button
-const button = document.getElementById("startButton");
-const timerDisplay = document.getElementById("timer");
-// Gắn sự kiện click
-button.addEventListener("click", () => {
-  startScenario(viewer, timerDisplay);
-});
+//showNotification();
+
+// // Lấy button
+// const button = document.getElementById("startButton");
+// const timerDisplay = document.getElementById("timer");
+// // Gắn sự kiện click
+// button.addEventListener("click", () => {
+//   startScenario(viewer, timerDisplay);
+// });
 
 function showNotification() {
   const toastContent = document.createElement("div");

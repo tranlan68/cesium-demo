@@ -31,7 +31,7 @@ export function enableNodeSelection(viewer) {
           // Tạo drone tại điểm bắt đầu
           console.log("nodeMap:", nodeMap);
           console.log("selectedNodes:", selectedNodes[0]);
-          let drone = createDrone(viewer, './assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 0);
+          let drone = createDrone(viewer, generateDroneId(), './assets/models/drone1.glb', Cesium.Color.RED);
           // Drone bay theo đường đi
           let startScenarioTime = Date.now()
           // Drone bay theo đường đi
@@ -89,7 +89,7 @@ export async function startScenario(viewer, timerDisplay) {
   if (waypoints.length > 1) {
     let reverseWaypoints = waypoints.slice().reverse();
     // Tạo drone tại điểm bắt đầu
-    let droneA = createDrone(viewer, './assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 0);
+    let droneA = createDrone(viewer, generateDroneId(), './assets/models/drone1.glb', Cesium.Color.RED);
     let startScenarioTime = Date.now()
     animateDroneAlongPath(viewer, droneA, waypoints, Cesium.Color.RED, 0, 0);
     let droneB = undefined;
@@ -163,7 +163,7 @@ export async function startScenario(viewer, timerDisplay) {
     await new Promise(resolve => setTimeout(resolve, 5000));
     // Tạo drone tại điểm bắt đầu
     console.error("createDrone droneB");
-    droneB = createDrone(viewer, './assets/models/drone2.glb', Cesium.Color.PURPLE, nodeMap[selectedNodes[1]], nodeMap, 0);
+    droneB = createDrone(viewer, generateDroneId(), './assets/models/drone2.glb', Cesium.Color.PURPLE);
     animateDroneAlongPath(viewer, droneB, reverseWaypoints, Cesium.Color.PURPLE, 0, 10);
   } else {
     console.warn("⚠️ Không tìm thấy đường đi giữa", start, "và", end);

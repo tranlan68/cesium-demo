@@ -12,7 +12,7 @@ export async function drawNetwork(viewer, url, radius = 300) {
   let routes = data.routes;
 
   drawRoutes(viewer, routes, radius);
-  drawNodes(viewer, nodes);
+  //drawNodes(viewer, nodes);
   window.__network = { viewer, nodes, nodeMap, routes };
 }
 

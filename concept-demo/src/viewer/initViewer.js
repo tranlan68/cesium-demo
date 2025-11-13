@@ -33,13 +33,13 @@ export function initViewer(containerId) {
         terrainProvider: new Cesium.EllipsoidTerrainProvider(),
     });
 
-    // const layer = viewer.imageryLayers.addImageryProvider(
-    //     new Cesium.UrlTemplateImageryProvider({
-    //         url: 'http://127.0.0.1:8080/datas/satellite/{z}/{x}/{y}.jpeg',
-    //         minimumLevel: 0,
-    //         maximumLevel: 22
-    //     })
-    // );
+    const layer = viewer.imageryLayers.addImageryProvider(
+        new Cesium.UrlTemplateImageryProvider({
+            url: 'http://127.0.0.1:8080/datas/satellite/{z}/{x}/{y}.jpeg',
+            minimumLevel: 0,
+            maximumLevel: 22
+        })
+    );
 
     // //viewer.scene.globe.enableLighting = true;
     viewer.scene.backgroundColor = Cesium.Color.GRAY;

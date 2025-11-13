@@ -18,7 +18,7 @@ function generateDroneId() {
  * @param {Object} startNode - node có {id, lat, lng, alt}
  * @param {Object} nodeMap - danh sách node theo id
  */
-export function createDrone(viewer, uri, textColor, startNode, nodeMap, offsetAlt) {
+export function createDrone(viewer, droneId, uri, textColor, position) {
   // if (!startNode || !startNode.id) {
   //   console.warn("⚠️ createDrone: startNode không hợp lệ", startNode);
   //   return null;
@@ -30,7 +30,7 @@ export function createDrone(viewer, uri, textColor, startNode, nodeMap, offsetAl
   //   return null;
   // }
 
-  let droneId = generateDroneId();
+  // let droneId = generateDroneId();
 
   // Xoá drone cũ nếu có
   if (drones.has(droneId)) {
@@ -38,7 +38,7 @@ export function createDrone(viewer, uri, textColor, startNode, nodeMap, offsetAl
     drones.delete(droneId);
   }
 
-  let position = Cesium.Cartesian3.fromDegrees(0, 0, 0);
+  if (!position) position = Cesium.Cartesian3.fromDegrees(0, 0, 0);
   let carto = Cesium.Cartographic.fromCartesian(position);
   let altitude = carto.height.toFixed(1);
 
@@ -101,10 +101,22 @@ export function getDrone(droneId) {
   return drones.get(droneId);
 }
 
+export function updateDrone(viewer, droneId, position) {
+  drones[droneId].position = position;
+}
+
+export function isExist(droneId) {
+  if (drones.has(droneId)) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * Xoá drone khỏi bản đồ
  */
 export function removeDrone(viewer, droneId) {
+  console.log("🗑️ TLLLLLLL removed: ", droneId);
   let entity = drones.get(droneId);
   if (entity) {
     viewer.entities.remove(entity);
