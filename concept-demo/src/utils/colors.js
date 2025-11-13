@@ -41,7 +41,7 @@ export function getBuildingColor(building, buildingColour, height) {
         else if (building === "university") color = "#ffc04d";
         else if (building === "dormitory") color = "#ffe680";
         else if (building === "canteen") color = "#ff9999";
-        const colorCode = buildingColour || color;                // cao tầng
+        let colorCode = buildingColour || color;                // cao tầng
 
         return colorCode
   }

@@ -23,9 +23,9 @@ viewer.scene.globe.baseColor = Cesium.Color.LIGHTGREY;
 viewer._cesiumWidget._creditContainer.style.display = "none";
 
 // --- Ngay sau khi viewer sẵn sàng ---
-const initialLon = 105.9425;   // kinh độ khu vực
-const initialLat = 20.984;   // vĩ độ khu vực
-const initialAlt = 500;     // độ cao (mét)
+let initialLon = 105.9425;   // kinh độ khu vực
+let initialLat = 20.984;   // vĩ độ khu vực
+let initialAlt = 500;     // độ cao (mét)
 viewer.camera.setView({
   destination: Cesium.Cartesian3.fromDegrees(initialLon, initialLat, initialAlt),
   orientation: {
@@ -45,10 +45,10 @@ loadOsmData(viewer, "./assets/maps/zone.json").then(() => {
 window.addEventListener("message", (e) => {
   try {
     console.log("📩 Received:", e.data);
-    const { lon, lat, alt, heading, pitch } = e.data;
+    let { lon, lat, alt, heading, pitch } = e.data;
     if (lon === undefined) return;
 
-    const pos = Cesium.Cartesian3.fromDegrees(lon, lat, alt);
+    let pos = Cesium.Cartesian3.fromDegrees(lon, lat, alt);
 
     // 🚀 Lần đầu tiên: bay đến vị trí drone
     if (!initialized) {

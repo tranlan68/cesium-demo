@@ -3,11 +3,11 @@ import osmtogeojson from "osmtogeojson";
 import { convertColor, getBuildingColor, getWaterColor, getParkColor, getHighwayColor } from "/src/utils/colors.js";
 
 export async function loadOsmData(viewer, url) {
-  const res = await fetch(url);
-  const osmData = await res.json();
-  const geojson = osmtogeojson(osmData);
+  let res = await fetch(url);
+  let osmData = await res.json();
+  let geojson = osmtogeojson(osmData);
 
-  const dataSource = await Cesium.GeoJsonDataSource.load(geojson, {
+  let dataSource = await Cesium.GeoJsonDataSource.load(geojson, {
     stroke: Cesium.Color.DIMGREY,
     fill: Cesium.Color.DIMGREY.withAlpha(0.4),
     clampToGround: true,
@@ -16,30 +16,30 @@ export async function loadOsmData(viewer, url) {
   viewer.dataSources.add(dataSource);
 
   dataSource.entities.values.forEach((entity) => {
-    const props = entity.properties;
+    let props = entity.properties;
     if (!props || !entity.polygon) return;
 
-    const get = (name) => props[name]?.getValue?.() ?? props[name]?._value ?? null;
-    const building = get("building");
-    const highway = get("highway");
-    const natural = get("natural");
-    const water = get("water");
-    const leisure = get("leisure");
+    let get = (name) => props[name]?.getValue?.() ?? props[name]?._value ?? null;
+    let building = get("building");
+    let highway = get("highway");
+    let natural = get("natural");
+    let water = get("water");
+    let leisure = get("leisure");
 
     // 🏠 1️⃣ Nếu là tòa nhà
     if (building && entity.polygon) {
-      const height = parseFloat(get("height") || 0);
-      const levels = parseInt(get("building:levels") || 0);
-      const ele = parseFloat(get("ele") || 0);
+      let height = parseFloat(get("height") || 0);
+      let levels = parseInt(get("building:levels") || 0);
+      let ele = parseFloat(get("ele") || 0);
 
-      const roofColor = convertColor(get("roof:colour"));
-      const wallColor = convertColor(get("building:colour")) || "#ffe680";
-      const roofShape = get("roof:shape") || "flat";
+      let roofColor = convertColor(get("roof:colour"));
+      let wallColor = convertColor(get("building:colour")) || "#ffe680";
+      let roofShape = get("roof:shape") || "flat";
 
       // Ưu tiên height, nếu không có thì tính từ số tầng
-      const buildingHeight = height || (levels ? levels * 3 : 8);
-      const roofHeight = roofShape === "flat" ? 0.5 : 1.5; // mái cao hơn nếu gabled
-      const color = getBuildingColor(building, convertColor(get("building:colour")), buildingHeight);
+      let buildingHeight = height || (levels ? levels * 3 : 8);
+      let roofHeight = roofShape === "flat" ? 0.5 : 1.5; // mái cao hơn nếu gabled
+      let color = getBuildingColor(building, convertColor(get("building:colour")), buildingHeight);
 
       entity.polygon.height = ele;
       entity.polygon.extrudedHeight = ele + buildingHeight;
@@ -62,15 +62,15 @@ export async function loadOsmData(viewer, url) {
 
       // Mái nghiêng (gabled) — tạo cảm giác nghiêng bằng hai phần mái chéo
       if (roofShape === "gabled" || roofShape === "hipped") {
-        const hierarchy = entity.polygon.hierarchy.getValue();
-        const positions = hierarchy.positions;
-        const midIndex = Math.floor(positions.length / 2);
+        let hierarchy = entity.polygon.hierarchy.getValue();
+        let positions = hierarchy.positions;
+        let midIndex = Math.floor(positions.length / 2);
 
-        const sideA = positions.slice(0, midIndex + 1);
-        const sideB = positions.slice(midIndex);
+        let sideA = positions.slice(0, midIndex + 1);
+        let sideB = positions.slice(midIndex);
 
-        const center = Cesium.BoundingSphere.fromPoints(positions).center;
-        const roofTop = Cesium.Cartesian3.add(center, new Cesium.Cartesian3(0, 0, roofHeight * 1.5), new Cesium.Cartesian3());
+        let center = Cesium.BoundingSphere.fromPoints(positions).center;
+        let roofTop = Cesium.Cartesian3.add(center, new Cesium.Cartesian3(0, 0, roofHeight * 1.5), new Cesium.Cartesian3());
 
         // Hai mặt mái chéo đối xứng
         viewer.entities.add({
@@ -91,7 +91,7 @@ export async function loadOsmData(viewer, url) {
     }
 
     else if ((natural === "water" || water) && entity.polygon) {
-      const color = getWaterColor();
+      let color = getWaterColor();
       entity.polygon.material = Cesium.Color.fromCssColorString(color).withAlpha(1.0);
       entity.polygon.height = 0;
       entity.polygon.extrudedHeight = 0;
@@ -99,7 +99,7 @@ export async function loadOsmData(viewer, url) {
     }
 
     else if (leisure === "park" && entity.polygon) {
-      const color = getParkColor();
+      let color = getParkColor();
       entity.polygon.material = Cesium.Color.fromCssColorString(color).withAlpha(1.0);
       entity.polygon.height = 0;
       entity.polygon.extrudedHeight = 0;
@@ -108,30 +108,30 @@ export async function loadOsmData(viewer, url) {
     }
 
     else if (highway && entity.polyline) {
-      const color = getHighwayColor();
+      let color = getHighwayColor();
       entity.polyline.material = new Cesium.ColorMaterialProperty(color);
       entity.polyline.width = 2;
       entity.polyline.clampToGround = true;
     }
   });
 
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(105.53155127448478, 20.998060344046042, 187.60914390648793),
-    orientation: {
-      heading: Cesium.Math.toRadians(42.78108298997944),
-      pitch: Cesium.Math.toRadians(-7.6748203243344495),
-      roll: 0.0
-    }
-  });
-
   // viewer.camera.flyTo({
-  //   destination: Cesium.Cartesian3.fromDegrees(105.53395691997767, 20.99443903629632, 328.4052465458374),
+  //   destination: Cesium.Cartesian3.fromDegrees(105.53019983618506, 20.99955570994703, 21.1140267260417),
   //   orientation: {
-  //     heading: Cesium.Math.toRadians(-2.0237228665196),
-  //     pitch: Cesium.Math.toRadians(-15.147108166705811),
+  //     heading: Cesium.Math.toRadians(75.21339269542429),
+  //     pitch: Cesium.Math.toRadians(-2.925571983535),
   //     roll: 0.0
   //   }
   // });
+
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(105.53187650203674, 20.999818907243, 106.86450300131213),
+    orientation: {
+      heading: Cesium.Math.toRadians(73.86862714472504),
+      pitch: Cesium.Math.toRadians(-14.625280380757209),
+      roll: 0.0
+    }
+  });
 
 
   // const controller = viewer.scene.screenSpaceCameraController;

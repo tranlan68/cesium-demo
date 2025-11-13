@@ -2,14 +2,14 @@ import * as Cesium from "cesium";
 import { createCylinderBetween , createCircleShape } from "/src/utils/geometry.js";
 
 export async function drawNetwork(viewer, url, radius = 300) {
-  const res = await fetch(url);
-  const data = await res.json();
-  const nodes = data.nodes;
-  const nodeMap = {};
+  let res = await fetch(url);
+  let data = await res.json();
+  let nodes = data.nodes;
+  let nodeMap = {};
   nodes.forEach(n => {
     nodeMap[n.id] = n;
   });
-  const routes = data.routes;
+  let routes = data.routes;
 
   drawRoutes(viewer, routes, radius);
   drawNodes(viewer, nodes);
@@ -19,7 +19,7 @@ export async function drawNetwork(viewer, url, radius = 300) {
 // --- Vẽ nodes ---
 function drawNodes(viewer, nodes) {
   nodes.forEach(node => {
-    const position = Cesium.Cartesian3.fromDegrees(node.lng, node.lat, node.alt ?? 0);
+    let position = Cesium.Cartesian3.fromDegrees(node.lng, node.lat, node.alt ?? 0);
     viewer.entities.add({
       id: node.id,
       position,
@@ -58,10 +58,10 @@ function drawRoutes(viewer, routes, radius = 150) {
   // });
 
   routes.forEach(route => {
-    const positions = route.path.map(p =>
+    let positions = route.path.map(p =>
       Cesium.Cartesian3.fromDegrees( p.lng, p.lat, -radius)
     );
-    const edgeEntity = viewer.entities.add({
+    let edgeEntity = viewer.entities.add({
       polylineVolume: {
         positions,
         shape: createCircleShape(radius),
@@ -83,11 +83,11 @@ function drawRoutes(viewer, routes, radius = 150) {
 
   //   // step: khoảng cách chia đoạn, càng nhỏ càng mượt
   // for (let i = 0; i < route.waypoints.length - 1; i++) {
-  //   const start = route.waypoints[i];
-  //   const end = route.waypoints[i + 1];
+  //   let start = route.waypoints[i];
+  //   let end = route.waypoints[i + 1];
 
-  //   const startCart = Cesium.Cartesian3.fromDegrees(start.lng, start.lat, start.alt);
-  //   const endCart = Cesium.Cartesian3.fromDegrees(end.lng, end.lat, end.alt);
+  //   let startCart = Cesium.Cartesian3.fromDegrees(start.lng, start.lat, start.alt);
+  //   let endCart = Cesium.Cartesian3.fromDegrees(end.lng, end.lat, end.alt);
 
   //   viewer.entities.add({
   //     polylineVolume: {
@@ -103,12 +103,12 @@ function drawRoutes(viewer, routes, radius = 150) {
 
 // Tạo vòng tròn nằm trên mặt phẳng vuông góc với trục
 function createCircle3D(center, next, radius = 1.5, segments = 16) {
-  const circle = [];
-  const forward = Cesium.Cartesian3.subtract(next, center, new Cesium.Cartesian3());
+  let circle = [];
+  let forward = Cesium.Cartesian3.subtract(next, center, new Cesium.Cartesian3());
   Cesium.Cartesian3.normalize(forward, forward);
 
   // Tìm vector vuông góc với forward
-  const up = Cesium.Cartesian3.UNIT_Z; // vector chuẩn
+  let up = Cesium.Cartesian3.UNIT_Z; // vector chuẩn
   let right = new Cesium.Cartesian3();
   Cesium.Cartesian3.cross(forward, up, right);
   if (Cesium.Cartesian3.magnitude(right) < 0.001) {
@@ -117,12 +117,12 @@ function createCircle3D(center, next, radius = 1.5, segments = 16) {
   }
   Cesium.Cartesian3.normalize(right, right);
 
-  const upCorrected = new Cesium.Cartesian3();
+  let upCorrected = new Cesium.Cartesian3();
   Cesium.Cartesian3.cross(right, forward, upCorrected);
 
   for (let i = 0; i <= segments; i++) {
-    const theta = (i / segments) * 2 * Math.PI;
-    const point = new Cesium.Cartesian3();
+    let theta = (i / segments) * 2 * Math.PI;
+    let point = new Cesium.Cartesian3();
     Cesium.Cartesian3.multiplyByScalar(right, Math.cos(theta) * radius, point);
     Cesium.Cartesian3.add(point, Cesium.Cartesian3.multiplyByScalar(upCorrected, Math.sin(theta) * radius, new Cesium.Cartesian3()), point);
     Cesium.Cartesian3.add(point, center, point);
@@ -134,11 +134,11 @@ function createCircle3D(center, next, radius = 1.5, segments = 16) {
 // Vẽ ống từ 1 chuỗi điểm
 function createSmoothCylinder(viewer, points, radius = 1.5, segments = 16, color = Cesium.Color.CYAN.withAlpha(0.3)) {
   for (let i = 0; i < points.length - 1; i++) {
-    const start = Cesium.Cartesian3.fromDegrees(points[i].lng, points[i].lat, points[i].alt);
-    const end = Cesium.Cartesian3.fromDegrees(points[i + 1].lng, points[i + 1].lat, points[i + 1].alt);
+    let start = Cesium.Cartesian3.fromDegrees(points[i].lng, points[i].lat, points[i].alt);
+    let end = Cesium.Cartesian3.fromDegrees(points[i + 1].lng, points[i + 1].lat, points[i + 1].alt);
 
-    const circleStart = createCircle3D(start, end, radius, segments);
-    const circleEnd = createCircle3D(end, start, radius, segments);
+    let circleStart = createCircle3D(start, end, radius, segments);
+    let circleEnd = createCircle3D(end, start, radius, segments);
 
     // Nối các điểm tương ứng giữa hai vòng tròn bằng polyline
     for (let j = 0; j < circleStart.length; j++) {

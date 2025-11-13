@@ -7,23 +7,23 @@ let warningEntity = null;
 export function enableNodeSelection(viewer) {
   let selectedNodes = [];
   const { nodes, nodeMap, routes } = window.__network;
-  const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  let handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 
   handler.setInputAction(function (click) {
-    const picked = viewer.scene.pick(click.position);
+    let picked = viewer.scene.pick(click.position);
     if (!Cesium.defined(picked)) return;
 
-    const type = picked.id?.properties?.getValue()?.type;
+    let type = picked.id?.properties?.getValue()?.type;
     if (type === "node") {
-      const nodeId = picked.id.id;
+      let nodeId = picked.id.id;
       console.log("🟢 Click node:", nodeId);
       selectedNodes.push(nodeId);
 
       //picked.id.point.color = Cesium.Color.RED; // tô màu node chọn -> không dùng được cho ảnh 3D
 
       if (selectedNodes.length === 2) {
-        const [start, end] = selectedNodes;
-        const waypoints = findWaypoints(routes, start, end);
+        let [start, end] = selectedNodes;
+        let waypoints = findWaypoints(routes, start, end);
         console.log("waypoints:", waypoints);
         if (waypoints.length > 1) {
           //highlightRoute(viewer, waypoints);
@@ -31,18 +31,18 @@ export function enableNodeSelection(viewer) {
           // Tạo drone tại điểm bắt đầu
           console.log("nodeMap:", nodeMap);
           console.log("selectedNodes:", selectedNodes[0]);
-          const drone = createDrone(viewer, './assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 0);
+          let drone = createDrone(viewer, './assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 0);
           // Drone bay theo đường đi
           let startScenarioTime = Date.now()
           // Drone bay theo đường đi
           openDroneWindow(viewer, drone);
           animateDroneAlongPath(viewer, drone, waypoints, Cesium.Color.RED, 0, 0);
 
-          const totalTime = waypoints.length; // mỗi waypoint = 1s
-          const start = viewer.clock.currentTime;
-          const stopTime = Cesium.JulianDate.addSeconds(start, totalTime, new Cesium.JulianDate());
+          let totalTime = waypoints.length; // mỗi waypoint = 1s
+          let start = viewer.clock.currentTime;
+          let stopTime = Cesium.JulianDate.addSeconds(start, totalTime, new Cesium.JulianDate());
 
-          const stopCheck = viewer.clock.onTick.addEventListener(() => {
+          let stopCheck = viewer.clock.onTick.addEventListener(() => {
             try {
               if (Cesium.JulianDate.greaterThanOrEquals(viewer.clock.currentTime, stopTime)) {
                 viewer.clock.shouldAnimate = false;
@@ -62,13 +62,13 @@ export function enableNodeSelection(viewer) {
       }
     }
     else if (type === "drone") {
-      const drone = picked.id;
+      let drone = picked.id;
       //setCameraFollowDrone(viewer, drone);
       //openDroneWindow(viewer, drone);
     }
 
     //   if (picked && picked.id && picked.id.id.startsWith('N')) {
-    //   const nodeId = picked.id.id;
+    //   let nodeId = picked.id.id;
     //   selectedNodes.push(nodeId);
     //   console.log("Selected:", nodeId);
 
@@ -84,29 +84,31 @@ export async function startScenario(viewer, timerDisplay) {
   let selectedNodes = ["VMC", "TTTC"];
   const { nodes, nodeMap, routes } = window.__network;
 
-  const [start, end] = selectedNodes;
-  const waypoints = findWaypoints(routes, start, end);
+  let [start, end] = selectedNodes;
+  let waypoints = findWaypoints(routes, start, end);
   if (waypoints.length > 1) {
-    const reverseWaypoints = waypoints.slice().reverse();
+    let reverseWaypoints = waypoints.slice().reverse();
     // Tạo drone tại điểm bắt đầu
-    const droneA = createDrone(viewer, './assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 0);
+    let droneA = createDrone(viewer, './assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 0);
     let startScenarioTime = Date.now()
     animateDroneAlongPath(viewer, droneA, waypoints, Cesium.Color.RED, 0, 0);
     let droneB = undefined;
 
     // Cập nhật mỗi frame
     let collisionWarning = createCollisionWarning(viewer);
-    viewer.clock.onTick.addEventListener(() => {
+
+    let tickHandler = function(clock) {
       try {
         let positionDroneA = getDronePosition(viewer, droneA);
         let positionDroneB = getDronePosition(viewer, droneB);
+        let elapsed = ((Date.now() - startScenarioTime) / 1000).toFixed(0);
         if (positionDroneA && positionDroneB) {
-          const d = distance(positionDroneA, positionDroneB);
+          let d = distance(positionDroneA, positionDroneB);
           console.log("Khoảng cách:", d.toFixed(2), "m");
-          if (d < 70) {
+          if (d < 80 && elapsed > 20) {
             //console.log("⚠️ Drone sắp gặp nhau! Khoảng cách:", d.toFixed(2), "m");
             // Tọa độ trung điểm để show cảnh báo
-            const midPos = interpolate(positionDroneA, positionDroneB, 0.5);
+            let midPos = interpolate(positionDroneA, positionDroneB, 0.5);
             showCollisionWarning(viewer, collisionWarning, midPos);
           } else {
             if (collisionWarning && collisionWarning.show === true) {
@@ -117,15 +119,46 @@ export async function startScenario(viewer, timerDisplay) {
         }
         if (!positionDroneA && !positionDroneB) {
           timerDisplay.textContent = "Hoàn thành";
+          viewer.clock.onTick.removeEventListener(tickHandler);
         } else {
-          const elapsed = ((Date.now() - startScenarioTime) / 1000).toFixed(0);
           timerDisplay.textContent = `Thời gian: ${elapsed}s`;
           console.log(timerDisplay.textContent);
         }
       } catch (e) {
         console.error("Error in onTick:", e);
       }
-    });
+    };
+    viewer.clock.onTick.addEventListener(tickHandler);
+    // viewer.clock.onTick.addEventListener(() => {
+    //   try {
+    //     let positionDroneA = getDronePosition(viewer, droneA);
+    //     let positionDroneB = getDronePosition(viewer, droneB);
+    //     let elapsed = ((Date.now() - startScenarioTime) / 1000).toFixed(0);
+    //     if (positionDroneA && positionDroneB) {
+    //       let d = distance(positionDroneA, positionDroneB);
+    //       console.log("Khoảng cách:", d.toFixed(2), "m");
+    //       if (d < 80 && elapsed > 20) {
+    //         //console.log("⚠️ Drone sắp gặp nhau! Khoảng cách:", d.toFixed(2), "m");
+    //         // Tọa độ trung điểm để show cảnh báo
+    //         let midPos = interpolate(positionDroneA, positionDroneB, 0.5);
+    //         showCollisionWarning(viewer, collisionWarning, midPos);
+    //       } else {
+    //         if (collisionWarning && collisionWarning.show === true) {
+    //           // Khoảng cách lớn hơn threshold → bỏ cảnh báo
+    //           hideCollisionWarning(viewer);
+    //         }
+    //       }
+    //     }
+    //     if (!positionDroneA && !positionDroneB) {
+    //       timerDisplay.textContent = "Hoàn thành";
+    //     } else {
+    //       timerDisplay.textContent = `Thời gian: ${elapsed}s`;
+    //       console.log(timerDisplay.textContent);
+    //     }
+    //   } catch (e) {
+    //     console.error("Error in onTick:", e);
+    //   }
+    // });
 
     await new Promise(resolve => setTimeout(resolve, 5000));
     // Tạo drone tại điểm bắt đầu
