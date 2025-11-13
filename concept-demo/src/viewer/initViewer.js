@@ -35,9 +35,9 @@ export function initViewer(containerId) {
 
     const layer = viewer.imageryLayers.addImageryProvider(
         new Cesium.UrlTemplateImageryProvider({
-            url: 'http://10.61.153.51:8080/datas/satellite/{z}/{x}/{y}.jpeg',
+            url: 'http://127.0.0.1:8080/datas/satellite/{z}/{x}/{y}.jpeg',
             minimumLevel: 0,
-            maximumLevel: 19
+            maximumLevel: 22
         })
     );
 
@@ -102,16 +102,24 @@ export function initViewer(containerId) {
     // }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     viewer.scene.preRender.addEventListener(() => {
+        try {
         const pos = viewer.camera.position;
-        const carto = Cesium.Cartographic.fromCartesian(pos);
-        const lon = Cesium.Math.toDegrees(carto.longitude);
-        const lat = Cesium.Math.toDegrees(carto.latitude);
-        const height = carto.height;
+        if (pos !== undefined) {
+            const carto = Cesium.Cartographic.fromCartesian(pos);
+            const lon = Cesium.Math.toDegrees(carto.longitude);
+            const lat = Cesium.Math.toDegrees(carto.latitude);
+            const height = carto.height;
 
-        const heading = Cesium.Math.toDegrees(viewer.camera.heading);
-        const pitch = Cesium.Math.toDegrees(viewer.camera.pitch);
-        const roll = Cesium.Math.toDegrees(viewer.camera.roll);
-        console.log(`lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}, roll: ${roll}`);
+            const heading = Cesium.Math.toDegrees(viewer.camera.heading);
+            const pitch = Cesium.Math.toDegrees(viewer.camera.pitch);
+            const roll = Cesium.Math.toDegrees(viewer.camera.roll);
+            //console.log(`lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}, roll: ${roll}`);
+        }
+        
+        } catch (error) {
+            console.error("Error getting camera position: ", error);
+        }
+        
     });
 
     // const minHeight = 50; // độ cao tối thiểu (mét so với ellipsoid)

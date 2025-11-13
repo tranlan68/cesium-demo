@@ -1,7 +1,7 @@
 import * as Cesium from "cesium";
-import { createCylinderBetween , createCircleShape } from "../../utils/geometry.js";
+import { createCylinderBetween , createCircleShape } from "/src/utils/geometry.js";
 
-export async function drawNetwork(viewer, url) {
+export async function drawNetwork(viewer, url, radius = 300) {
   const res = await fetch(url);
   const data = await res.json();
   const nodes = data.nodes;
@@ -11,7 +11,7 @@ export async function drawNetwork(viewer, url) {
   });
   const routes = data.routes;
 
-  drawRoutes(viewer, routes);
+  drawRoutes(viewer, routes, radius);
   drawNodes(viewer, nodes);
   window.__network = { viewer, nodes, nodeMap, routes };
 }
@@ -24,7 +24,7 @@ function drawNodes(viewer, nodes) {
       id: node.id,
       position,
       model: {
-        uri: '/assets/models/postbox.glb',
+        uri: './assets/models/postbox.glb',
         scale: 0.5,
         minimumPixelSize: 40,       // đảm bảo nhìn rõ khi zoom xa
         //heightReference: Cesium.HeightReference.NONE, // luôn thấy node
@@ -50,22 +50,22 @@ function drawNodes(viewer, nodes) {
 }
 
 // --- Vẽ routes ---
-function drawRoutes(viewer, routes) {
+function drawRoutes(viewer, routes, radius = 150) {
 
   // routes.forEach(route => {
-  //   // route.waypoints là mảng các điểm {lng, lat, alt}
-  //   createSmoothCylinder(viewer, route.waypoints, 25, 64, Cesium.Color.CYAN.withAlpha(0.2));
+  //   // route.path là mảng các điểm {lng, lat, alt}
+  //   createSmoothCylinder(viewer, route.path, 25, 64, Cesium.Color.CYAN.withAlpha(0.2));
   // });
 
   routes.forEach(route => {
-    const positions = route.waypoints.map(p =>
-      Cesium.Cartesian3.fromDegrees( p.lng, p.lat, p.alt)
+    const positions = route.path.map(p =>
+      Cesium.Cartesian3.fromDegrees( p.lng, p.lat, -radius)
     );
     const edgeEntity = viewer.entities.add({
       polylineVolume: {
         positions,
-        shape: createCircleShape(25),
-        material: Cesium.Color.CYAN.withAlpha(0.15),
+        shape: createCircleShape(radius),
+        material: Cesium.Color.CYAN.withAlpha(0.2),
       },
     });
 

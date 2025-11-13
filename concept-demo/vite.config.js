@@ -8,13 +8,15 @@ export default defineConfig({
       targets: [
         {
           src: "node_modules/cesium/Build/Cesium",
-          dest: "" // copy vào /cesium ở thư mục build
+          dest: "" // copy vào dist/Cesium
+          // dest: "" // copy vào /cesium ở thư mục build
         }
       ]
     })
   ],
   define: {
-    CESIUM_BASE_URL: JSON.stringify("/Cesium")
+    // CESIUM_BASE_URL: JSON.stringify("/Cesium")
+    CESIUM_BASE_URL: JSON.stringify("./Cesium")
   },
   resolve: {
     alias: {

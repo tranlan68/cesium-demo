@@ -1,6 +1,6 @@
 import * as Cesium from "cesium";
 import osmtogeojson from "osmtogeojson";
-import { convertColor, getBuildingColor, getWaterColor, getParkColor, getHighwayColor } from "../utils/colors.js";
+import { convertColor, getBuildingColor, getWaterColor, getParkColor, getHighwayColor } from "/src/utils/colors.js";
 
 export async function loadOsmData(viewer, url) {
   const res = await fetch(url);
@@ -115,35 +115,11 @@ export async function loadOsmData(viewer, url) {
     }
   });
 
-  //viewer.camera.flyTo({
-  // destination: Cesium.Cartesian3.fromDegrees(105.53342318412915, 20.994101238379113, 260),
-  // orientation: {
-  //   heading: Cesium.Math.toRadians(0.33682039563390415),
-  //   pitch: Cesium.Math.toRadians(-10.493338218153408),
-  //   roll: 0.0014834891349461406
-  // }
-  //});
-  // viewer.camera.flyTo({
-  //   destination: Cesium.Cartesian3.fromDegrees(105.532990, 20.993363, 550),
-  //   orientation: {
-  //     heading: Cesium.Math.toRadians(0.0),
-  //     pitch: Cesium.Math.toRadians(-20.0),
-  //     roll: 0.0
-  //   }
-  // });
-  // viewer.camera.flyTo({
-  //   destination: Cesium.Cartesian3.fromDegrees(105.53451043289633, 20.993023938316764, 312.6936316638395),
-  //   orientation: {
-  //     heading: Cesium.Math.toRadians(-2.0237229623822),
-  //     pitch: Cesium.Math.toRadians(-15.147118188543894),
-  //     roll: 0.0
-  //   }
-  // });
   viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(105.53377934763978, 20.993509799956758, 312.81418464916686),
+    destination: Cesium.Cartesian3.fromDegrees(105.53155127448478, 20.998060344046042, 187.60914390648793),
     orientation: {
-      heading: Cesium.Math.toRadians(-2.0237229392047),
-      pitch: Cesium.Math.toRadians(-15.147115765475485),
+      heading: Cesium.Math.toRadians(42.78108298997944),
+      pitch: Cesium.Math.toRadians(-7.6748203243344495),
       roll: 0.0
     }
   });

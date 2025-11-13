@@ -17,12 +17,12 @@ if (!viewer) {
 } 
 
 // --- 2️⃣ Load OSM (bản đồ nền khu vực) ---
-loadOsmData(viewer, "/assets/maps/hoalac1.json").then(() => {
+loadOsmData(viewer, "./assets/maps/hoalac1.json").then(() => {
   console.log("✅ OSM loaded and rendered.");
 });
 
 // --- 3️⃣ Load và hiển thị network ---
-drawNetwork(viewer, "/assets/maps/flight_paths_detailed.json").then(() => {
+drawNetwork(viewer, "./assets/maps/flight_paths_detailed_2.json", 110).then(() => {
   //enableNodeSelection(viewer);
   console.log("Network loaded ✅ Click 2 nodes to draw shortest path.");
 });

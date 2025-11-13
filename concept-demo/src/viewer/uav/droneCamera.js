@@ -1,5 +1,5 @@
 import * as Cesium from "cesium";
-import { loadOsmData } from "../osmLoader.js";
+import { loadOsmData } from "/src/viewer/osmLoader.js";
 
 Cesium.Ion.defaultAccessToken = "";
 
@@ -38,11 +38,12 @@ viewer.camera.setView({
 let initialized = false;
 
 // Load cùng zone.json với main viewer (nếu muốn hiển thị môi trường)
-loadOsmData(viewer, "/assets/maps/zone.json").then(() => {
+loadOsmData(viewer, "./assets/maps/zone.json").then(() => {
   console.log("✅ Zone loaded in popup.");
 });
 
 window.addEventListener("message", (e) => {
+  try {
   console.log("📩 Received:", e.data);
   const { lon, lat, alt, heading, pitch } = e.data;
   if (lon === undefined) return;
@@ -72,4 +73,6 @@ window.addEventListener("message", (e) => {
       100
     )
   );
+  } catch (error) {
+  }
 });
