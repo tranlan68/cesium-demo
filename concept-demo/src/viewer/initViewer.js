@@ -54,7 +54,7 @@ export function initViewer(containerId) {
     const controller = viewer.scene.screenSpaceCameraController;
     controller.enableRotate = true;         // Cho phép xoay ngang
     //controller.enableTranslate = true;     
-    controller.enableTilt = false;           // Cho phép nghiêng
+    controller.enableTilt = true;           // Cho phép nghiêng
     controller.enableZoom = true;           // Cho phép zoom
     controller.enableLook = true;           // Cho phép "nhìn quanh" bằng chuột phải
     controller.minimumZoomDistance = 1.0;   // Không giới hạn zoom gần

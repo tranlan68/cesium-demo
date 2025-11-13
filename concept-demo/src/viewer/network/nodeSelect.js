@@ -44,15 +44,15 @@ export function enableNodeSelection(viewer) {
 
           const stopCheck = viewer.clock.onTick.addEventListener(() => {
             try {
-            if (Cesium.JulianDate.greaterThanOrEquals(viewer.clock.currentTime, stopTime)) {
-              viewer.clock.shouldAnimate = false;
-              stopCheck(); // gỡ listener
-              // đóng popup
-              window.postMessage({ type: "closeDronePopup" }, "*");
-            } 
-          } catch (e) {
-            console.error("Error in stopCheck:", e);  
-          }
+              if (Cesium.JulianDate.greaterThanOrEquals(viewer.clock.currentTime, stopTime)) {
+                viewer.clock.shouldAnimate = false;
+                stopCheck(); // gỡ listener
+                // đóng popup
+                window.postMessage({ type: "closeDronePopup" }, "*");
+              }
+            } catch (e) {
+              console.error("Error in stopCheck:", e);
+            }
           });
 
         } else {
@@ -98,33 +98,33 @@ export async function startScenario(viewer, timerDisplay) {
     let collisionWarning = createCollisionWarning(viewer);
     viewer.clock.onTick.addEventListener(() => {
       try {
-      let positionDroneA = getDronePosition(viewer, droneA);
-      let positionDroneB = getDronePosition(viewer, droneB);
-      if (positionDroneA && positionDroneB) {
-        const d = distance(positionDroneA, positionDroneB);
-        console.log("Khoảng cách:", d.toFixed(2), "m");
-        if (d < 150) {
-          //console.log("⚠️ Drone sắp gặp nhau! Khoảng cách:", d.toFixed(2), "m");
-          // Tọa độ trung điểm để show cảnh báo
-          const midPos = interpolate(positionDroneA, positionDroneB, 0.5);
-          showCollisionWarning(viewer, collisionWarning, midPos);
-        } else {
-          if (collisionWarning && collisionWarning.show === true) {
-            // Khoảng cách lớn hơn threshold → bỏ cảnh báo
-            hideCollisionWarning(viewer);
+        let positionDroneA = getDronePosition(viewer, droneA);
+        let positionDroneB = getDronePosition(viewer, droneB);
+        if (positionDroneA && positionDroneB) {
+          const d = distance(positionDroneA, positionDroneB);
+          console.log("Khoảng cách:", d.toFixed(2), "m");
+          if (d < 70) {
+            //console.log("⚠️ Drone sắp gặp nhau! Khoảng cách:", d.toFixed(2), "m");
+            // Tọa độ trung điểm để show cảnh báo
+            const midPos = interpolate(positionDroneA, positionDroneB, 0.5);
+            showCollisionWarning(viewer, collisionWarning, midPos);
+          } else {
+            if (collisionWarning && collisionWarning.show === true) {
+              // Khoảng cách lớn hơn threshold → bỏ cảnh báo
+              hideCollisionWarning(viewer);
+            }
           }
         }
+        if (!positionDroneA && !positionDroneB) {
+          timerDisplay.textContent = "Hoàn thành";
+        } else {
+          const elapsed = ((Date.now() - startScenarioTime) / 1000).toFixed(0);
+          timerDisplay.textContent = `Thời gian: ${elapsed}s`;
+          console.log(timerDisplay.textContent);
+        }
+      } catch (e) {
+        console.error("Error in onTick:", e);
       }
-      if (!positionDroneA && !positionDroneB) {
-        timerDisplay.textContent = "Hoàn thành";
-      } else {
-        const elapsed = ((Date.now() - startScenarioTime) / 1000).toFixed(0);
-        timerDisplay.textContent = `Thời gian: ${elapsed}s`;
-        console.log(timerDisplay.textContent);
-      }
-    } catch (e) {
-      console.error("Error in onTick:", e);
-    }
     });
 
     await new Promise(resolve => setTimeout(resolve, 5000));
@@ -174,13 +174,13 @@ function showCollisionWarning(viewer, warningEntity, midPos) {
 
   let blinkSpeed = 2.0;
   if (!warningEntity.position) {
-  setInterval(() => {
-    if (warningEntity && warningEntity.show === true) {
-      const seconds = Cesium.JulianDate.toDate(viewer.clock.currentTime).getTime() / 1000.0;
-      const alpha = (Math.sin(seconds * Math.PI * blinkSpeed) + 1) / 2; // dao động từ 0 → 1
-      warningEntity.label.fillColor = Cesium.Color.RED.withAlpha(alpha * 0.9 + 0.1);
-    }
-  }, 500);
+    setInterval(() => {
+      if (warningEntity && warningEntity.show === true) {
+        const seconds = Cesium.JulianDate.toDate(viewer.clock.currentTime).getTime() / 1000.0;
+        const alpha = (Math.sin(seconds * Math.PI * blinkSpeed) + 1) / 2; // dao động từ 0 → 1
+        warningEntity.label.fillColor = Cesium.Color.RED.withAlpha(alpha * 0.9 + 0.1);
+      }
+    }, 500);
   }
 }
 
