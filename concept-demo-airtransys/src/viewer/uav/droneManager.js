@@ -3,6 +3,7 @@ import * as Cesium from "cesium";
 import { createCylinderBetween, createCircleShape } from "/src/utils/geometry.js";
 
 const drones = new Map(); // Lưu tất cả drone đang hoạt động
+
 let droneCounter = 0;     // Đếm để sinh ID tự động
 
 
@@ -101,8 +102,29 @@ export function getDrone(droneId) {
   return drones.get(droneId);
 }
 
+export function getDronePath(droneId) {
+  return dronePaths.get(droneId);
+}
+
+export function drawDronePath(viewer, droneId, color) {
+  dronePaths[droneId] = [];
+  // let highlightEntity = viewer.entities.add({
+  //   name: "Drone Path Highlight",
+  //   polylineVolume: {
+  //     positions: new Cesium.CallbackProperty(() => dronePaths[droneId], false),
+  //     shape: createCircleShape(0.5),
+  //     material: color.withAlpha(0.9),
+  //   }
+  // });
+}
+
 export function updateDrone(viewer, droneId, position) {
   drones[droneId].position = position;
+  if (!dronePaths[droneId]) {
+    dronePaths[droneId] = [];
+  }
+  dronePaths[droneId].push(position);
+
 }
 
 export function isExist(droneId) {
@@ -116,7 +138,6 @@ export function isExist(droneId) {
  * Xoá drone khỏi bản đồ
  */
 export function removeDrone(viewer, droneId) {
-  console.log("🗑️ TLLLLLLL removed: ", droneId);
   let entity = drones.get(droneId);
   if (entity) {
     viewer.entities.remove(entity);

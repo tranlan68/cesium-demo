@@ -1,16 +1,18 @@
 import * as Cesium from "cesium";
 import { getTracks } from "/src/airtransys/tracks.js"
-import { createDrone, updateDrone, removeDrone , getAllDrones , isExist } from "/src/viewer/uav/droneManager.js"
+import { createDrone, updateDrone, removeDrone , getAllDrones , isExist , getDrone } from "/src/viewer/uav/droneManager.js"
+
+let dronePaths = {};
 
 export async function updateTracks(viewer) {
     let tracks = await getTracks();
     if (tracks) {
-        console.log("TLLLLLLL tracks: ", tracks);
         if (!tracks.length) {
             // remove all tracks
             let oldTracks = getAllDrones();
             oldTracks.forEach(oldTrack => {
                 removeDrone(viewer, oldTrack.id);
+                viewer.entities.removeById(`drone_${oldTrack.id}_history`);
             });
         } else {
             // Remove oldTrack
@@ -24,6 +26,7 @@ export async function updateTracks(viewer) {
                 });
                 if (isRemoved) {
                     removeDrone(viewer, oldTrack.id);
+                    viewer.entities.removeById(`drone_${oldTrack.id}_history`);
                 }
             });
             // Update tracks
@@ -36,15 +39,32 @@ export async function updateTracks(viewer) {
 function updateDronePositions(viewer, tracks) {
     tracks.forEach(track => {
         if (track && track.object_track_id && track.position.longitude && track.position.latitude && track.position.altitude != undefined) {
-            const position = Cesium.Cartesian3.fromDegrees(track.position.longitude, track.position.latitude, track.position.altitude);
-            if (!isExist(track.object_track_id)) {
+            let position = Cesium.Cartesian3.fromDegrees(track.position.longitude, track.position.latitude, track.position.altitude - 32);
+            let drone = getDrone(track.object_track_id);
+            //if (!isExist(track.object_track_id)) {
+            if (!drone) {
                 // Tạo mới nếu chưa có
-                console.log("TLLLLLLL createDrone id: ", track.object_track_id);
-                createDrone(viewer, track.object_track_id, './assets/models/drone1.glb', Cesium.Color.RED, position);
+                createDrone(viewer, track.object_track_id, './assets/models/drone2.glb', Cesium.Color.RED, position);
+                dronePaths[track.object_track_id] = {
+                    positions: [],
+                    entity: viewer.entities.add({
+                        id: `drone_${track.object_track_id}_history`,
+                        name: `drone_${track.object_track_id}_history`,
+                        polyline: {
+                            positions: new Cesium.CallbackProperty(() => {
+                                return dronePaths[track.object_track_id].positions;
+                            }, false),
+                            width: 1,
+                            material: Cesium.Color.RED,
+                            clampToGround: false
+                        }
+                    })
+                };
+                //dronePaths[track.object_track_id].positions.push(position);
             } else {
                 // Cập nhật vị trí nếu đã có
-                console.log("TLLLLLLL updateDrone position: ", position);
-                updateDrone(viewer, track.object_track_id, position);
+                drone.position = position;
+                //dronePaths[track.object_track_id].positions.push(position);
             }
         }
     });

@@ -29,7 +29,7 @@ drawNetwork(viewer, "./assets/maps/flight_paths_detailed_3.json", 50).then(() =>
 });
 
 updateTracks(viewer);
-setInterval(() => updateTracks(viewer), 10000);
+setInterval(() => updateTracks(viewer), 1000);
 
 //showNotification();
 

@@ -124,12 +124,21 @@ export async function loadOsmData(viewer, url) {
   //   }
   // });
 
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(105.53187650203674, 20.999818907243, 106.86450300131213),
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(73.86862714472504),
+  //     pitch: Cesium.Math.toRadians(-14.625280380757209),
+  //     roll: 0.0
+  //   }
+  // });
+
   viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(105.53187650203674, 20.999818907243, 106.86450300131213),
+    destination: Cesium.Cartesian3.fromDegrees(105.53144970995119, 20.999432599375684, 268.8832091417887),
     orientation: {
-      heading: Cesium.Math.toRadians(73.86862714472504),
-      pitch: Cesium.Math.toRadians(-14.625280380757209),
-      roll: 0.0
+      heading: Cesium.Math.toRadians(67.89153225404225),
+      pitch: Cesium.Math.toRadians(-23.859788354461987),
+      roll: 0.003603240879509745
     }
   });
 

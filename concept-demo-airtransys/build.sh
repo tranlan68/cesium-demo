@@ -7,6 +7,6 @@ fi
 
 echo "VERSION: $VERSION"
 
-CONCEPT_IMAGE="fe-3d-concept:$VERSION"
+CONCEPT_IMAGE="at-3d-realdata:$VERSION"
 
 docker build --rm -t "$CONCEPT_IMAGE" .

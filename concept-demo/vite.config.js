@@ -26,6 +26,9 @@ export default defineConfig({
   base: "./",    
   server: {
     host: true,   
-    port: 8081
+    port: 8081,
+    watch: {
+      ignored: ['**/public/assets/**']  // bỏ qua folder nặng
+    }
   }
 });

@@ -292,7 +292,7 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
           }
         }
       }, false),
-      shape: createCircleShape(0.5),
+      shape: createCircleShape(0.5, 16),
       material: color.withAlpha(0.9),
     }
   });
