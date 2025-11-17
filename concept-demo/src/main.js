@@ -3,18 +3,21 @@ import "cesium/Build/Cesium/Widgets/widgets.css";
 import { initViewer } from "./viewer/initViewer.js";
 import { loadOsmData } from "./viewer/osmLoader.js";
 import { drawNetwork } from "./viewer/network/drawNetwork.js";
-import { enableNodeSelection , startScenario} from "./viewer/network/nodeSelect.js";
-import Toastify from 'toastify-js';
-import 'toastify-js/src/toastify.css'
+import {
+  enableNodeSelection,
+  startScenario,
+} from "./viewer/network/nodeSelect.js";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 
-window.CESIUM_BASE_URL = '/node_modules/cesium/Build/Cesium/';
+window.CESIUM_BASE_URL = "/node_modules/cesium/Build/Cesium/";
 Cesium.Ion.defaultAccessToken = undefined;
 
 // --- 1️⃣ Khởi tạo viewer ---
 const viewer = initViewer("cesiumContainer");
 if (!viewer) {
   console.error("❌ Viewer not initialized!");
-} 
+}
 
 // --- 2️⃣ Load OSM (bản đồ nền khu vực) ---
 loadOsmData(viewer, "./assets/maps/hoalac1.json").then(() => {
@@ -22,10 +25,12 @@ loadOsmData(viewer, "./assets/maps/hoalac1.json").then(() => {
 });
 
 // --- 3️⃣ Load và hiển thị network ---
-drawNetwork(viewer, "./assets/maps/flight_paths_detailed_3.json", 50).then(() => {
-  //enableNodeSelection(viewer);
-  console.log("Network loaded ✅ Click 2 nodes to draw shortest path.");
-});
+drawNetwork(viewer, "./assets/maps/flight_paths_detailed_4_1.json", 10).then(
+  () => {
+    //enableNodeSelection(viewer);
+    console.log("Network loaded ✅ Click 2 nodes to draw shortest path.");
+  }
+);
 
 showNotification();
 
@@ -73,8 +78,8 @@ function showNotification() {
     position: "left",
     style: {
       background: "linear-gradient(to right, #00b09b, #96c93d)",
-      frontSize: "14px"
-    }
+      frontSize: "14px",
+    },
     //backgroundColor: "#4caf50"
   });
   toast.showToast();
@@ -82,6 +87,3 @@ function showNotification() {
     toast.hideToast();
   });
 }
-
-
-

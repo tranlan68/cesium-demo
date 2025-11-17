@@ -1,10 +1,12 @@
 import * as Cesium from "cesium";
 
-import { createCylinderBetween, createCircleShape } from "/src/utils/geometry.js";
+import {
+  createCylinderBetween,
+  createCircleShape,
+} from "/src/utils/geometry.js";
 
 const drones = new Map(); // Lưu tất cả drone đang hoạt động
-let droneCounter = 0;     // Đếm để sinh ID tự động
-
+let droneCounter = 0; // Đếm để sinh ID tự động
 
 // 🧠 Hàm sinh ID tự động
 function generateDroneId() {
@@ -18,7 +20,14 @@ function generateDroneId() {
  * @param {Object} startNode - node có {id, lat, lng, alt}
  * @param {Object} nodeMap - danh sách node theo id
  */
-export function createDrone(viewer, uri, textColor, startNode, nodeMap, offsetAlt) {
+export function createDrone(
+  viewer,
+  uri,
+  textColor,
+  startNode,
+  nodeMap,
+  offsetAlt
+) {
   // if (!startNode || !startNode.id) {
   //   console.warn("⚠️ createDrone: startNode không hợp lệ", startNode);
   //   return null;
@@ -57,7 +66,7 @@ export function createDrone(viewer, uri, textColor, startNode, nodeMap, offsetAl
       minimumPixelSize: 60,
       maximumScale: 100,
       runAnimations: true,
-      heightReference: Cesium.HeightReference.NONE
+      heightReference: Cesium.HeightReference.NONE,
     },
     orientation: new Cesium.VelocityOrientationProperty(
       new Cesium.SampledPositionProperty()
@@ -65,12 +74,12 @@ export function createDrone(viewer, uri, textColor, startNode, nodeMap, offsetAl
 
     label: {
       text: `Độ cao ${altitude} m`,
-      font: 'bold 16px sans-serif',
+      font: "bold 16px sans-serif",
       fillColor: textColor,
       pixelOffset: new Cesium.Cartesian2(0, -15),
       disableDepthTestDistance: Number.POSITIVE_INFINITY,
     },
-    properties: { type: "drone" }
+    properties: { type: "drone" },
   });
   entity.label.text = new Cesium.CallbackProperty((time) => {
     try {
@@ -84,11 +93,9 @@ export function createDrone(viewer, uri, textColor, startNode, nodeMap, offsetAl
             return `Độ cao ${alt} m`;
           }
           return `Độ cao ${alt} m`;
-        } catch (e) {
-        }
+        } catch (e) {}
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }, false);
   drones.set(droneId, entity);
 
@@ -116,8 +123,15 @@ export function removeDrone(viewer, droneId) {
 /**
  * Di chuyển drone dọc theo đường đi (path)
  */
-export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt, offsetAlt2) {
-  let changeTime = 36;
+export function animateDroneAlongPath(
+  viewer,
+  drone,
+  waypoints,
+  color,
+  offsetAlt,
+  offsetAlt2
+) {
+  let changeTime = 44;
   if (!drone || !waypoints || waypoints.length === 0) {
     console.warn("⚠️ animateDroneAlongPath: Drone hoặc path không hợp lệ");
     return;
@@ -144,9 +158,17 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
 
     if (i < changeTime) {
       try {
-        offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
-        let position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt + offsetArray[i]);
-        let time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+        offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 0.6);
+        let position = Cesium.Cartesian3.fromDegrees(
+          wp.lng,
+          wp.lat,
+          wp.alt + offsetAlt + offsetArray[i]
+        );
+        let time = Cesium.JulianDate.addSeconds(
+          start,
+          t,
+          new Cesium.JulianDate()
+        );
         property.addSample(time, position);
         t += 1;
         //highlightedPositions.push(position);
@@ -154,32 +176,63 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
         console.error("Error adding sample at i =", i, "wp:", wp, e);
       }
     } else if (i === changeTime) {
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
-      let position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt + offsetArray[i]);
-      let time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 0.6);
+      let position = Cesium.Cartesian3.fromDegrees(
+        wp.lng,
+        wp.lat,
+        wp.alt + offsetAlt + offsetArray[i]
+      );
+      let time = Cesium.JulianDate.addSeconds(
+        start,
+        t,
+        new Cesium.JulianDate()
+      );
       property.addSample(time, position);
       t += 1;
 
       i++;
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 0.6);
       wp = waypoints[i];
-      let position2 = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + (offsetAlt2 + offsetAlt) / 2 + offsetArray[i]);
-      let time2 = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+      let position2 = Cesium.Cartesian3.fromDegrees(
+        wp.lng,
+        wp.lat,
+        wp.alt + (offsetAlt2 + offsetAlt) / 2 + offsetArray[i]
+      );
+      let time2 = Cesium.JulianDate.addSeconds(
+        start,
+        t,
+        new Cesium.JulianDate()
+      );
       property.addSample(time2, position2);
       t += 1;
 
       i++;
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 0.6);
       wp = waypoints[i];
-      let position3 = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt2 + offsetArray[i]);
-      let time3 = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+      let position3 = Cesium.Cartesian3.fromDegrees(
+        wp.lng,
+        wp.lat,
+        wp.alt + offsetAlt2 + offsetArray[i]
+      );
+      let time3 = Cesium.JulianDate.addSeconds(
+        start,
+        t,
+        new Cesium.JulianDate()
+      );
       property.addSample(time3, position3);
       t += 1;
-
     } else {
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
-      let position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt2 + offsetArray[i]);
-      let time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 0.6);
+      let position = Cesium.Cartesian3.fromDegrees(
+        wp.lng,
+        wp.lat,
+        wp.alt + offsetAlt2 + offsetArray[i]
+      );
+      let time = Cesium.JulianDate.addSeconds(
+        start,
+        t,
+        new Cesium.JulianDate()
+      );
       property.addSample(time, position);
       t += 1;
       //highlightedPositions.push(position);
@@ -188,19 +241,28 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
 
   drone.position = property;
   //drone.orientation = new Cesium.VelocityOrientationProperty(property);
-  drone.orientation = new Cesium.CallbackPositionProperty(function (time, result) {
+  drone.orientation = new Cesium.CallbackPositionProperty(function (
+    time,
+    result
+  ) {
     try {
       let position = drone.position.getValue(time);
       let heading = 0;
-      return Cesium.Transforms.headingPitchRollQuaternion(position, new Cesium.HeadingPitchRoll(heading, 0, 0));
+      return Cesium.Transforms.headingPitchRollQuaternion(
+        position,
+        new Cesium.HeadingPitchRoll(heading, 0, 0)
+      );
     } catch (e) {
       console.error("Error in orientation callback:", e);
     }
-
   }, false);
 
   viewer.clock.startTime = start.clone();
-  viewer.clock.stopTime = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+  viewer.clock.stopTime = Cesium.JulianDate.addSeconds(
+    start,
+    t,
+    new Cesium.JulianDate()
+  );
   viewer.clock.currentTime = start.clone();
   viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;
   viewer.clock.multiplier = 1;
@@ -239,13 +301,18 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
   // });
   let highlightEntity = viewer.entities.add({
     name: "Drone Path Highlight",
-    polylineVolume: {
+    polyline: {
+      //polylineVolume: {
       positions: new Cesium.CallbackProperty(() => {
         while (true) {
           try {
             let positions = [];
             let currentTime = viewer.clock.currentTime;
-            let end = Cesium.JulianDate.addSeconds(start, waypoints.length, new Cesium.JulianDate());
+            let end = Cesium.JulianDate.addSeconds(
+              start,
+              waypoints.length,
+              new Cesium.JulianDate()
+            );
 
             // khi hết thời gian thì xóa entity
             if (Cesium.JulianDate.greaterThanOrEquals(currentTime, end)) {
@@ -253,34 +320,64 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
               return [];
             }
 
-            positions.push(Cesium.Cartesian3.fromDegrees(
-              waypoints[0].lng, waypoints[0].lat, waypoints[0].alt
-            ));
+            positions.push(
+              Cesium.Cartesian3.fromDegrees(
+                waypoints[0].lng,
+                waypoints[0].lat,
+                waypoints[0].alt
+              )
+            );
             for (let i = 0; i < waypoints.length; i++) {
-              let t = Cesium.JulianDate.addSeconds(start, i, new Cesium.JulianDate());
+              let t = Cesium.JulianDate.addSeconds(
+                start,
+                i,
+                new Cesium.JulianDate()
+              );
               if (Cesium.JulianDate.lessThanOrEquals(t, currentTime)) {
                 if (i < changeTime) {
-                  positions.push(Cesium.Cartesian3.fromDegrees(
-                    waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + offsetAlt + offsetArray[i]
-                  ));
+                  positions.push(
+                    Cesium.Cartesian3.fromDegrees(
+                      waypoints[i].lng,
+                      waypoints[i].lat,
+                      waypoints[i].alt + offsetAlt + offsetArray[i]
+                    )
+                  );
                 } else if (i === changeTime) {
-                  positions.push(Cesium.Cartesian3.fromDegrees(
-                    waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + offsetAlt + offsetArray[i]
-                  ));
-                  i++
-                  new Promise(resolve => setTimeout(resolve, 1000));
-                  positions.push(Cesium.Cartesian3.fromDegrees(
-                    waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + (offsetAlt2 + offsetAlt) / 2 + offsetArray[i]
-                  ));
-                  i++
-                  new Promise(resolve => setTimeout(resolve, 1000));
-                  positions.push(Cesium.Cartesian3.fromDegrees(
-                    waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + offsetAlt2 + offsetArray[i]
-                  ));
+                  positions.push(
+                    Cesium.Cartesian3.fromDegrees(
+                      waypoints[i].lng,
+                      waypoints[i].lat,
+                      waypoints[i].alt + offsetAlt + offsetArray[i]
+                    )
+                  );
+                  i++;
+                  new Promise((resolve) => setTimeout(resolve, 1000));
+                  positions.push(
+                    Cesium.Cartesian3.fromDegrees(
+                      waypoints[i].lng,
+                      waypoints[i].lat,
+                      waypoints[i].alt +
+                        (offsetAlt2 + offsetAlt) / 2 +
+                        offsetArray[i]
+                    )
+                  );
+                  i++;
+                  new Promise((resolve) => setTimeout(resolve, 1000));
+                  positions.push(
+                    Cesium.Cartesian3.fromDegrees(
+                      waypoints[i].lng,
+                      waypoints[i].lat,
+                      waypoints[i].alt + offsetAlt2 + offsetArray[i]
+                    )
+                  );
                 } else {
-                  positions.push(Cesium.Cartesian3.fromDegrees(
-                    waypoints[i].lng, waypoints[i].lat, waypoints[i].alt + offsetAlt2 + offsetArray[i]
-                  ));
+                  positions.push(
+                    Cesium.Cartesian3.fromDegrees(
+                      waypoints[i].lng,
+                      waypoints[i].lat,
+                      waypoints[i].alt + offsetAlt2 + offsetArray[i]
+                    )
+                  );
                 }
               } else {
                 break;
@@ -292,9 +389,11 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
           }
         }
       }, false),
-      shape: createCircleShape(0.5, 16),
+      //shape: createCircleShape(0.5, 16),
       material: color.withAlpha(0.9),
-    }
+      width: 2,
+      clampToGround: false,
+    },
   });
 }
 
@@ -321,30 +420,31 @@ export function setCameraFollowDrone(viewer, drone) {
         nextPos.y += 5;
 
         let heading = getHeadingFromPositions(pos, nextPos);
-        let pitch = Cesium.Math.toRadians(-15);   // nhìn xuống 15 độ
-        let range = 30;                           // camera cách drone 30m
+        let pitch = Cesium.Math.toRadians(-15); // nhìn xuống 15 độ
+        let range = 30; // camera cách drone 30m
 
         // 🎯 Đây là dòng quan trọng – không dùng Transforms
         viewer.camera.lookAt(
           pos,
           new Cesium.HeadingPitchRange(heading, pitch, range)
         );
-      } catch (e) {
-      }
+      } catch (e) {}
     });
-  } catch (error) {
-  }
+  } catch (error) {}
 }
 
 function getHeadingFromPositions(startPos, endPos) {
   let startCarto = Cesium.Cartographic.fromCartesian(startPos);
   let endCarto = Cesium.Cartographic.fromCartesian(endPos);
 
-  let y = Math.sin(endCarto.longitude - startCarto.longitude) *
+  let y =
+    Math.sin(endCarto.longitude - startCarto.longitude) *
     Math.cos(endCarto.latitude);
-    let x = Math.cos(startCarto.latitude) * Math.sin(endCarto.latitude) -
-    Math.sin(startCarto.latitude) * Math.cos(endCarto.latitude) *
-    Math.cos(endCarto.longitude - startCarto.longitude);
+  let x =
+    Math.cos(startCarto.latitude) * Math.sin(endCarto.latitude) -
+    Math.sin(startCarto.latitude) *
+      Math.cos(endCarto.latitude) *
+      Math.cos(endCarto.longitude - startCarto.longitude);
 
   let heading = Math.atan2(y, x);
   return Cesium.Math.zeroToTwoPi(heading);
@@ -359,7 +459,6 @@ function getHeadingFromPositions(startPos, endPos) {
 //   activeDrone = null;
 // }
 
-
 // Hàm mở popup và gửi dữ liệu drone liên tục
 export function openDroneWindow(mainViewer, drone) {
   let win = window.open("./dronePopup.html", "_blank", "width=600,height=300");
@@ -369,13 +468,16 @@ export function openDroneWindow(mainViewer, drone) {
     if (!pos) return;
 
     let carto = Cesium.Cartographic.fromCartesian(pos);
-    win.postMessage({
-      lon: Cesium.Math.toDegrees(carto.longitude),
-      lat: Cesium.Math.toDegrees(carto.latitude),
-      alt: carto.height,
-      heading: drone.heading || 0,
-      pitch: -15
-    }, "*");
+    win.postMessage(
+      {
+        lon: Cesium.Math.toDegrees(carto.longitude),
+        lat: Cesium.Math.toDegrees(carto.latitude),
+        alt: carto.height,
+        heading: drone.heading || 0,
+        pitch: -15,
+      },
+      "*"
+    );
   }
 
   let interval = setInterval(() => {
@@ -386,12 +488,11 @@ export function openDroneWindow(mainViewer, drone) {
   // gửi vị trí ban đầu sớm hơn một chút
   setTimeout(sendPosition, 200);
 
-  window.addEventListener("message", e => {
+  window.addEventListener("message", (e) => {
     try {
       if (e.data?.type === "closeDronePopup") {
         win.close();
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   });
 }

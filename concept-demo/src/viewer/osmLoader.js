@@ -1,6 +1,12 @@
 import * as Cesium from "cesium";
 import osmtogeojson from "osmtogeojson";
-import { convertColor, getBuildingColor, getWaterColor, getParkColor, getHighwayColor } from "/src/utils/colors.js";
+import {
+  convertColor,
+  getBuildingColor,
+  getWaterColor,
+  getParkColor,
+  getHighwayColor,
+} from "/src/utils/colors.js";
 
 export async function loadOsmData(viewer, url) {
   let res = await fetch(url);
@@ -19,7 +25,8 @@ export async function loadOsmData(viewer, url) {
     let props = entity.properties;
     if (!props || !entity.polygon) return;
 
-    let get = (name) => props[name]?.getValue?.() ?? props[name]?._value ?? null;
+    let get = (name) =>
+      props[name]?.getValue?.() ?? props[name]?._value ?? null;
     let building = get("building");
     let highway = get("highway");
     let natural = get("natural");
@@ -39,11 +46,16 @@ export async function loadOsmData(viewer, url) {
       // Ưu tiên height, nếu không có thì tính từ số tầng
       let buildingHeight = height || (levels ? levels * 3 : 8);
       let roofHeight = roofShape === "flat" ? 0.5 : 1.5; // mái cao hơn nếu gabled
-      let color = getBuildingColor(building, convertColor(get("building:colour")), buildingHeight);
+      let color = getBuildingColor(
+        building,
+        convertColor(get("building:colour")),
+        buildingHeight
+      );
 
       entity.polygon.height = ele;
       entity.polygon.extrudedHeight = ele + buildingHeight;
-      entity.polygon.material = Cesium.Color.fromCssColorString(color).withAlpha(1.0);
+      entity.polygon.material =
+        Cesium.Color.fromCssColorString(color).withAlpha(1.0);
       entity.polygon.outline = true;
       entity.polygon.outlineColor = Cesium.Color.BLACK;
 
@@ -70,44 +82,46 @@ export async function loadOsmData(viewer, url) {
         let sideB = positions.slice(midIndex);
 
         let center = Cesium.BoundingSphere.fromPoints(positions).center;
-        let roofTop = Cesium.Cartesian3.add(center, new Cesium.Cartesian3(0, 0, roofHeight * 1.5), new Cesium.Cartesian3());
+        let roofTop = Cesium.Cartesian3.add(
+          center,
+          new Cesium.Cartesian3(0, 0, roofHeight * 1.5),
+          new Cesium.Cartesian3()
+        );
 
         // Hai mặt mái chéo đối xứng
         viewer.entities.add({
           polygon: {
             hierarchy: { positions: [...sideA, roofTop] },
-            material: Cesium.Color.fromCssColorString(roofColor).withAlpha(0.95),
+            material:
+              Cesium.Color.fromCssColorString(roofColor).withAlpha(0.95),
             height: ele + buildingHeight,
           },
         });
         viewer.entities.add({
           polygon: {
             hierarchy: { positions: [...sideB, roofTop] },
-            material: Cesium.Color.fromCssColorString(roofColor).withAlpha(0.95),
+            material:
+              Cesium.Color.fromCssColorString(roofColor).withAlpha(0.95),
             height: ele + buildingHeight,
           },
         });
       }
-    }
-
-    else if ((natural === "water" || water) && entity.polygon) {
+    } else if ((natural === "water" || water) && entity.polygon) {
       let color = getWaterColor();
-      entity.polygon.material = Cesium.Color.fromCssColorString(color).withAlpha(1.0);
+      entity.polygon.material =
+        Cesium.Color.fromCssColorString(color).withAlpha(1.0);
       entity.polygon.height = 0;
       entity.polygon.extrudedHeight = 0;
       entity.polygon.outline = false;
-    }
-
-    else if (leisure === "park" && entity.polygon) {
+    } else if (leisure === "park" && entity.polygon) {
       let color = getParkColor();
-      entity.polygon.material = Cesium.Color.fromCssColorString(color).withAlpha(1.0);
+      entity.polygon.material =
+        Cesium.Color.fromCssColorString(color).withAlpha(1.0);
       entity.polygon.height = 0;
       entity.polygon.extrudedHeight = 0;
       entity.polygon.outline = true;
       entity.polygon.outlineColor = Cesium.Color.DARKGREEN;
-    }
-
-    else if (highway && entity.polyline) {
+    } else if (highway && entity.polyline) {
       let color = getHighwayColor();
       entity.polyline.material = new Cesium.ColorMaterialProperty(color);
       entity.polyline.width = 2;
@@ -133,15 +147,46 @@ export async function loadOsmData(viewer, url) {
   //   }
   // });
 
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(105.53144970995119, 20.999432599375684, 268.8832091417887),
-    orientation: {
-      heading: Cesium.Math.toRadians(67.89153225404225),
-      pitch: Cesium.Math.toRadians(-23.859788354461987),
-      roll: 0.003603240879509745
-    }
-  });
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(
+  //     105.53144970995119,
+  //     20.999432599375684,
+  //     268.8832091417887
+  //   ),
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(67.89153225404225),
+  //     pitch: Cesium.Math.toRadians(-23.859788354461987),
+  //     roll: 0.003603240879509745,
+  //   },
+  // });
 
+  // // 4_2
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(
+  //     105.53513349050885,
+  //     20.995869442063338,
+  //     267.30130266831696
+  //   ),
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(2.1889560866446303),
+  //     pitch: Cesium.Math.toRadians(-25.51606658836522),
+  //     roll: 0.0006127,
+  //   },
+  // });
+
+  // 4_1
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(
+      105.53547898784254,
+      20.998233766442777,
+      120.49922314828953
+    ),
+    orientation: {
+      heading: Cesium.Math.toRadians(19.038724556214312),
+      pitch: Cesium.Math.toRadians(-13.382623359096758),
+      roll: 0.000131888856114918,
+    },
+  });
 
   // const controller = viewer.scene.screenSpaceCameraController;
   // controller.enableRotate = false;

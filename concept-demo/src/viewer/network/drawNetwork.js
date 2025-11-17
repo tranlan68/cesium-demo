@@ -1,12 +1,15 @@
 import * as Cesium from "cesium";
-import { createCylinderBetween , createCircleShape } from "/src/utils/geometry.js";
+import {
+  createCylinderBetween,
+  createCircleShape,
+} from "/src/utils/geometry.js";
 
 export async function drawNetwork(viewer, url, radius = 300) {
   let res = await fetch(url);
   let data = await res.json();
   let nodes = data.nodes;
   let nodeMap = {};
-  nodes.forEach(n => {
+  nodes.forEach((n) => {
     nodeMap[n.id] = n;
   });
   let routes = data.routes;
@@ -17,18 +20,22 @@ export async function drawNetwork(viewer, url, radius = 300) {
 }
 
 // --- Vẽ nodes ---
-function drawNodes(viewer, nodes) {
-  nodes.forEach(node => {
-    let position = Cesium.Cartesian3.fromDegrees(node.lng, node.lat, node.alt ?? 0);
+function drawNodes(viewer, nodes, radius = 15) {
+  nodes.forEach((node) => {
+    let position = Cesium.Cartesian3.fromDegrees(
+      node.lng,
+      node.lat,
+      node.alt ?? 0
+    );
     viewer.entities.add({
       id: node.id,
       position,
       model: {
-        uri: './assets/models/postbox.glb',
+        uri: "./assets/models/postbox.glb",
         scale: 0.5,
-        minimumPixelSize: 40,       // đảm bảo nhìn rõ khi zoom xa
+        minimumPixelSize: 40, // đảm bảo nhìn rõ khi zoom xa
         //heightReference: Cesium.HeightReference.NONE, // luôn thấy node
-        disableDepthTestDistance: Number.POSITIVE_INFINITY
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
       },
       // point: {
       //   pixelSize: 7.5,
@@ -46,20 +53,36 @@ function drawNodes(viewer, nodes) {
       },
       properties: new Cesium.PropertyBag({ type: "node" }),
     });
+
+    if (node.id === "P1") {
+      // cot
+      let positions = [];
+      positions.push(Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 0));
+      positions.push(Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 20));
+      let edgeEntity = viewer.entities.add({
+        polylineVolume: {
+          positions,
+          shape: createCircleShape(radius, 32, 1),
+          material: Cesium.Color.CYAN.withAlpha(0.2),
+        },
+      });
+
+      // Đánh dấu là edge để loại bỏ khi click
+      edgeEntity.properties = new Cesium.PropertyBag({ type: "edge" });
+    }
   });
 }
 
 // --- Vẽ routes ---
 function drawRoutes(viewer, routes, radius = 150) {
-
   // routes.forEach(route => {
   //   // route.path là mảng các điểm {lng, lat, alt}
   //   createSmoothCylinder(viewer, route.path, 25, 64, Cesium.Color.CYAN.withAlpha(0.2));
   // });
 
-  routes.forEach(route => {
-    let positions = route.path.map(p =>
-      Cesium.Cartesian3.fromDegrees( p.lng, p.lat, -radius)
+  routes.forEach((route) => {
+    let positions = route.path.map((p) =>
+      Cesium.Cartesian3.fromDegrees(p.lng, p.lat, 30 - 10)
     );
     let edgeEntity = viewer.entities.add({
       polylineVolume: {
@@ -81,30 +104,33 @@ function drawRoutes(viewer, routes, radius = 150) {
     //   }
     // });
 
-  //   // step: khoảng cách chia đoạn, càng nhỏ càng mượt
-  // for (let i = 0; i < route.waypoints.length - 1; i++) {
-  //   let start = route.waypoints[i];
-  //   let end = route.waypoints[i + 1];
+    //   // step: khoảng cách chia đoạn, càng nhỏ càng mượt
+    // for (let i = 0; i < route.waypoints.length - 1; i++) {
+    //   let start = route.waypoints[i];
+    //   let end = route.waypoints[i + 1];
 
-  //   let startCart = Cesium.Cartesian3.fromDegrees(start.lng, start.lat, start.alt);
-  //   let endCart = Cesium.Cartesian3.fromDegrees(end.lng, end.lat, end.alt);
+    //   let startCart = Cesium.Cartesian3.fromDegrees(start.lng, start.lat, start.alt);
+    //   let endCart = Cesium.Cartesian3.fromDegrees(end.lng, end.lat, end.alt);
 
-  //   viewer.entities.add({
-  //     polylineVolume: {
-  //       positions: [startCart, endCart],
-  //       shape: createCircleShape(25, 64),
-  //       material: Cesium.Color.CYAN.withAlpha(0.2),
-  //     }
-  //   });
-  // }
+    //   viewer.entities.add({
+    //     polylineVolume: {
+    //       positions: [startCart, endCart],
+    //       shape: createCircleShape(25, 64),
+    //       material: Cesium.Color.CYAN.withAlpha(0.2),
+    //     }
+    //   });
+    // }
   });
 }
-
 
 // Tạo vòng tròn nằm trên mặt phẳng vuông góc với trục
 function createCircle3D(center, next, radius = 1.5, segments = 16) {
   let circle = [];
-  let forward = Cesium.Cartesian3.subtract(next, center, new Cesium.Cartesian3());
+  let forward = Cesium.Cartesian3.subtract(
+    next,
+    center,
+    new Cesium.Cartesian3()
+  );
   Cesium.Cartesian3.normalize(forward, forward);
 
   // Tìm vector vuông góc với forward
@@ -124,7 +150,15 @@ function createCircle3D(center, next, radius = 1.5, segments = 16) {
     let theta = (i / segments) * 2 * Math.PI;
     let point = new Cesium.Cartesian3();
     Cesium.Cartesian3.multiplyByScalar(right, Math.cos(theta) * radius, point);
-    Cesium.Cartesian3.add(point, Cesium.Cartesian3.multiplyByScalar(upCorrected, Math.sin(theta) * radius, new Cesium.Cartesian3()), point);
+    Cesium.Cartesian3.add(
+      point,
+      Cesium.Cartesian3.multiplyByScalar(
+        upCorrected,
+        Math.sin(theta) * radius,
+        new Cesium.Cartesian3()
+      ),
+      point
+    );
     Cesium.Cartesian3.add(point, center, point);
     circle.push(point);
   }
@@ -132,10 +166,24 @@ function createCircle3D(center, next, radius = 1.5, segments = 16) {
 }
 
 // Vẽ ống từ 1 chuỗi điểm
-function createSmoothCylinder(viewer, points, radius = 1.5, segments = 16, color = Cesium.Color.CYAN.withAlpha(0.3)) {
+function createSmoothCylinder(
+  viewer,
+  points,
+  radius = 1.5,
+  segments = 16,
+  color = Cesium.Color.CYAN.withAlpha(0.3)
+) {
   for (let i = 0; i < points.length - 1; i++) {
-    let start = Cesium.Cartesian3.fromDegrees(points[i].lng, points[i].lat, points[i].alt);
-    let end = Cesium.Cartesian3.fromDegrees(points[i + 1].lng, points[i + 1].lat, points[i + 1].alt);
+    let start = Cesium.Cartesian3.fromDegrees(
+      points[i].lng,
+      points[i].lat,
+      points[i].alt
+    );
+    let end = Cesium.Cartesian3.fromDegrees(
+      points[i + 1].lng,
+      points[i + 1].lat,
+      points[i + 1].alt
+    );
 
     let circleStart = createCircle3D(start, end, radius, segments);
     let circleEnd = createCircle3D(end, start, radius, segments);
@@ -147,7 +195,7 @@ function createSmoothCylinder(viewer, points, radius = 1.5, segments = 16, color
           positions: [circleStart[j], circleEnd[j]],
           width: 2,
           material: color,
-        }
+        },
       });
     }
   }

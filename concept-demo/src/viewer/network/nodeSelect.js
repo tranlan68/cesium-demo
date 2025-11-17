@@ -1,5 +1,10 @@
 import * as Cesium from "cesium";
-import { animateDroneAlongPath, createDrone, setCameraFollowDrone, openDroneWindow } from "/src/viewer/uav/droneManager.js";
+import {
+  animateDroneAlongPath,
+  createDrone,
+  setCameraFollowDrone,
+  openDroneWindow,
+} from "/src/viewer/uav/droneManager.js";
 import { highlightRoute } from "./pathDrawer.js";
 
 let warningEntity = null;
@@ -31,20 +36,43 @@ export function enableNodeSelection(viewer) {
           // Tạo drone tại điểm bắt đầu
           console.log("nodeMap:", nodeMap);
           console.log("selectedNodes:", selectedNodes[0]);
-          let drone = createDrone(viewer, './assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 0);
+          let drone = createDrone(
+            viewer,
+            "./assets/models/drone1.glb",
+            Cesium.Color.RED,
+            nodeMap[selectedNodes[0]],
+            nodeMap,
+            0
+          );
           // Drone bay theo đường đi
-          let startScenarioTime = Date.now()
+          let startScenarioTime = Date.now();
           // Drone bay theo đường đi
           openDroneWindow(viewer, drone);
-          animateDroneAlongPath(viewer, drone, waypoints, Cesium.Color.RED, 0, 0);
+          animateDroneAlongPath(
+            viewer,
+            drone,
+            waypoints,
+            Cesium.Color.RED,
+            0,
+            0
+          );
 
           let totalTime = waypoints.length; // mỗi waypoint = 1s
           let start = viewer.clock.currentTime;
-          let stopTime = Cesium.JulianDate.addSeconds(start, totalTime, new Cesium.JulianDate());
+          let stopTime = Cesium.JulianDate.addSeconds(
+            start,
+            totalTime,
+            new Cesium.JulianDate()
+          );
 
           let stopCheck = viewer.clock.onTick.addEventListener(() => {
             try {
-              if (Cesium.JulianDate.greaterThanOrEquals(viewer.clock.currentTime, stopTime)) {
+              if (
+                Cesium.JulianDate.greaterThanOrEquals(
+                  viewer.clock.currentTime,
+                  stopTime
+                )
+              ) {
                 viewer.clock.shouldAnimate = false;
                 stopCheck(); // gỡ listener
                 // đóng popup
@@ -54,14 +82,12 @@ export function enableNodeSelection(viewer) {
               console.error("Error in stopCheck:", e);
             }
           });
-
         } else {
           console.warn("⚠️ Không tìm thấy đường đi giữa", start, "và", end);
         }
         selectedNodes = [];
       }
-    }
-    else if (type === "drone") {
+    } else if (type === "drone") {
       let drone = picked.id;
       //setCameraFollowDrone(viewer, drone);
       //openDroneWindow(viewer, drone);
@@ -89,15 +115,22 @@ export async function startScenario(viewer, timerDisplay) {
   if (waypoints.length > 1) {
     let reverseWaypoints = waypoints.slice().reverse();
     // Tạo drone tại điểm bắt đầu
-    let droneA = createDrone(viewer, './assets/models/drone1.glb', Cesium.Color.RED, nodeMap[selectedNodes[0]], nodeMap, 0);
-    let startScenarioTime = Date.now()
+    let droneA = createDrone(
+      viewer,
+      "./assets/models/drone1.glb",
+      Cesium.Color.RED,
+      nodeMap[selectedNodes[0]],
+      nodeMap,
+      0
+    );
+    let startScenarioTime = Date.now();
     animateDroneAlongPath(viewer, droneA, waypoints, Cesium.Color.RED, 0, 0);
     let droneB = undefined;
 
     // Cập nhật mỗi frame
     let collisionWarning = createCollisionWarning(viewer);
 
-    let tickHandler = function(clock) {
+    let tickHandler = function (clock) {
       try {
         let positionDroneA = getDronePosition(viewer, droneA);
         let positionDroneB = getDronePosition(viewer, droneB);
@@ -105,7 +138,7 @@ export async function startScenario(viewer, timerDisplay) {
         if (positionDroneA && positionDroneB) {
           let d = distance(positionDroneA, positionDroneB);
           console.log("Khoảng cách:", d.toFixed(2), "m");
-          if (d < 80 && elapsed > 20) {
+          if (d < 40 && elapsed > 20) {
             //console.log("⚠️ Drone sắp gặp nhau! Khoảng cách:", d.toFixed(2), "m");
             // Tọa độ trung điểm để show cảnh báo
             let midPos = interpolate(positionDroneA, positionDroneB, 0.5);
@@ -160,11 +193,25 @@ export async function startScenario(viewer, timerDisplay) {
     //   }
     // });
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     // Tạo drone tại điểm bắt đầu
     console.error("createDrone droneB");
-    droneB = createDrone(viewer, './assets/models/drone2.glb', Cesium.Color.PURPLE, nodeMap[selectedNodes[1]], nodeMap, 0);
-    animateDroneAlongPath(viewer, droneB, reverseWaypoints, Cesium.Color.PURPLE, 0, 10);
+    droneB = createDrone(
+      viewer,
+      "./assets/models/drone2.glb",
+      Cesium.Color.PURPLE,
+      nodeMap[selectedNodes[1]],
+      nodeMap,
+      0
+    );
+    animateDroneAlongPath(
+      viewer,
+      droneB,
+      reverseWaypoints,
+      Cesium.Color.PURPLE,
+      0,
+      10
+    );
   } else {
     console.warn("⚠️ Không tìm thấy đường đi giữa", start, "và", end);
   }
@@ -196,22 +243,25 @@ function createCollisionWarning(viewer) {
       pixelOffset: new Cesium.Cartesian2(0, -40),
       disableDepthTestDistance: Number.POSITIVE_INFINITY,
     },
-    show: false
+    show: false,
   });
   return warningEntity;
 }
 
 function showCollisionWarning(viewer, warningEntity, midPos) {
-  warningEntity.position = getElevatedPosition(midPos, 20);  // cập nhật vị trí
-  warningEntity.show = true;        // hiển thị
+  warningEntity.position = getElevatedPosition(midPos, 20); // cập nhật vị trí
+  warningEntity.show = true; // hiển thị
 
   let blinkSpeed = 2.0;
   if (!warningEntity.position) {
     setInterval(() => {
       if (warningEntity && warningEntity.show === true) {
-        const seconds = Cesium.JulianDate.toDate(viewer.clock.currentTime).getTime() / 1000.0;
+        const seconds =
+          Cesium.JulianDate.toDate(viewer.clock.currentTime).getTime() / 1000.0;
         const alpha = (Math.sin(seconds * Math.PI * blinkSpeed) + 1) / 2; // dao động từ 0 → 1
-        warningEntity.label.fillColor = Cesium.Color.RED.withAlpha(alpha * 0.9 + 0.1);
+        warningEntity.label.fillColor = Cesium.Color.RED.withAlpha(
+          alpha * 0.9 + 0.1
+        );
       }
     }, 500);
   }
@@ -234,7 +284,6 @@ function getElevatedPosition(cartesian, heightOffset = 50) {
     cartographic.height
   );
 }
-
 
 function getDronePosition(viewer, drone) {
   if (!drone) return undefined;
@@ -260,15 +309,14 @@ function distance(c1, c2) {
 
 function findWaypoints(routes, a, b) {
   // tìm các route giữa a và b
-  const route = routes.find(r =>
-    (r.from === a && r.to === b) || (r.from === b && r.to === a)
+  const route = routes.find(
+    (r) => (r.from === a && r.to === b) || (r.from === b && r.to === a)
   );
   console.error("route: ", route);
   if (route && route !== undefined) {
     if (route.from === a) {
       return route.waypoints;
-    }
-    else {
+    } else {
       return route.waypoints.reverse();
     }
   }
