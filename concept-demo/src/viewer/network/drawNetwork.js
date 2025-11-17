@@ -58,13 +58,25 @@ function drawNodes(viewer, nodes, radius = 15) {
       // cot
       let positions = [];
       positions.push(Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 0));
-      positions.push(Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 20));
+      positions.push(Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 10));
       let edgeEntity = viewer.entities.add({
-        polylineVolume: {
-          positions,
-          shape: createCircleShape(radius, 32, 1),
-          material: Cesium.Color.CYAN.withAlpha(0.2),
-        },
+        // polylineVolume: {
+        //   positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+        //     node.lng, node.lat, 0,
+        //     node.lng, node.lat, 10
+        //   ]),
+        //  //positions: positions,
+        //  cornerType: Cesium.CornerType.MITERED,
+        //   shape: createCircleShape(radius, 32, 1),
+        //   material: Cesium.Color.CYAN.withAlpha(0.2),
+        // },
+        position: Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 10), // 5 = center
+    cylinder: {
+        length: 30,
+        topRadius: 20,
+        bottomRadius: 20,
+        material: Cesium.Color.CYAN.withAlpha(0.2)
+    }
       });
 
       // Đánh dấu là edge để loại bỏ khi click
@@ -82,7 +94,7 @@ function drawRoutes(viewer, routes, radius = 150) {
 
   routes.forEach((route) => {
     let positions = route.path.map((p) =>
-      Cesium.Cartesian3.fromDegrees(p.lng, p.lat, 30 - 10)
+      Cesium.Cartesian3.fromDegrees(p.lng, p.lat, 30 - 5)
     );
     let edgeEntity = viewer.entities.add({
       polylineVolume: {

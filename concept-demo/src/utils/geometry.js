@@ -3,15 +3,15 @@ import * as Cesium from "cesium";
 export function createCircleShape(radius = 1.5, segments = 4, mode = 0) {
   let shape = [];
   if (mode === 0) {
-    segments = 4; // Hình vuông
-    shape.push(new Cesium.Cartesian2(-radius, -radius));
-    shape.push(new Cesium.Cartesian2(radius, -radius));
-    shape.push(new Cesium.Cartesian2(radius, radius));
-    shape.push(new Cesium.Cartesian2(-radius, radius));
+    segments = 4; // Hình hộp chữ nhật
+    shape.push(new Cesium.Cartesian2(-radius*1.5, -radius/2));
+    shape.push(new Cesium.Cartesian2(radius*1.5, -radius/2));
+    shape.push(new Cesium.Cartesian2(radius*1.5, radius/2));
+    shape.push(new Cesium.Cartesian2(-radius*1.5, radius/2));
   } else {
-    segments = 64;
+    segments = 32;
     for (let i = 0; i <= segments; i++) {
-      const theta = (i / segments) * 2 * Math.PI;
+      let theta = (i / segments) * 2 * Math.PI;
       shape.push(
         new Cesium.Cartesian2(
           Math.cos(theta) * radius,

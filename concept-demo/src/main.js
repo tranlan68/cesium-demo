@@ -25,7 +25,7 @@ loadOsmData(viewer, "./assets/maps/hoalac1.json").then(() => {
 });
 
 // --- 3️⃣ Load và hiển thị network ---
-drawNetwork(viewer, "./assets/maps/flight_paths_detailed_4_1.json", 10).then(
+drawNetwork(viewer, "./assets/maps/flight_paths_detailed_4_1.json", 11).then(
   () => {
     //enableNodeSelection(viewer);
     console.log("Network loaded ✅ Click 2 nodes to draw shortest path.");
