@@ -20,7 +20,7 @@ export async function drawNetwork(viewer, url, radius = 300) {
 }
 
 // --- Vẽ nodes ---
-function drawNodes(viewer, nodes) {
+function drawNodes(viewer, nodes, radius = 15) {
   nodes.forEach((node) => {
     let position = Cesium.Cartesian3.fromDegrees(
       node.lng,
@@ -53,6 +53,35 @@ function drawNodes(viewer, nodes) {
       },
       properties: new Cesium.PropertyBag({ type: "node" }),
     });
+
+    if (node.id === "P1") {
+      // cot
+      let positions = [];
+      positions.push(Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 0));
+      positions.push(Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 10));
+      let edgeEntity = viewer.entities.add({
+        // polylineVolume: {
+        //   positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+        //     node.lng, node.lat, 0,
+        //     node.lng, node.lat, 10
+        //   ]),
+        //  //positions: positions,
+        //  cornerType: Cesium.CornerType.MITERED,
+        //   shape: createCircleShape(radius, 32, 1),
+        //   material: Cesium.Color.CYAN.withAlpha(0.2),
+        // },
+        position: Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 10), // 5 = center
+    cylinder: {
+        length: 30,
+        topRadius: 20,
+        bottomRadius: 20,
+        material: Cesium.Color.CYAN.withAlpha(0.2)
+    }
+      });
+
+      // Đánh dấu là edge để loại bỏ khi click
+      edgeEntity.properties = new Cesium.PropertyBag({ type: "edge" });
+    }
   });
 }
 
@@ -65,7 +94,7 @@ function drawRoutes(viewer, routes, radius = 150) {
 
   routes.forEach((route) => {
     let positions = route.path.map((p) =>
-      Cesium.Cartesian3.fromDegrees(p.lng, p.lat, 30)
+      Cesium.Cartesian3.fromDegrees(p.lng, p.lat, 30 - 5)
     );
     let edgeEntity = viewer.entities.add({
       polylineVolume: {

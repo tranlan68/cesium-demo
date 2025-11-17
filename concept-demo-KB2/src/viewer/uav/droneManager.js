@@ -131,7 +131,7 @@ export function animateDroneAlongPath(
   offsetAlt,
   offsetAlt2
 ) {
-  let changeTime = 36;
+  let changeTime = 63;
   if (!drone || !waypoints || waypoints.length === 0) {
     console.warn("⚠️ animateDroneAlongPath: Drone hoặc path không hợp lệ");
     return;
@@ -158,7 +158,7 @@ export function animateDroneAlongPath(
 
     if (i < changeTime) {
       try {
-        offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+        offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
         let position = Cesium.Cartesian3.fromDegrees(
           wp.lng,
           wp.lat,
@@ -176,7 +176,7 @@ export function animateDroneAlongPath(
         console.error("Error adding sample at i =", i, "wp:", wp, e);
       }
     } else if (i === changeTime) {
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
       let position = Cesium.Cartesian3.fromDegrees(
         wp.lng,
         wp.lat,
@@ -191,7 +191,7 @@ export function animateDroneAlongPath(
       t += 1;
 
       i++;
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
       wp = waypoints[i];
       let position2 = Cesium.Cartesian3.fromDegrees(
         wp.lng,
@@ -207,7 +207,7 @@ export function animateDroneAlongPath(
       t += 1;
 
       i++;
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
       wp = waypoints[i];
       let position3 = Cesium.Cartesian3.fromDegrees(
         wp.lng,
@@ -222,7 +222,7 @@ export function animateDroneAlongPath(
       property.addSample(time3, position3);
       t += 1;
     } else {
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
       let position = Cesium.Cartesian3.fromDegrees(
         wp.lng,
         wp.lat,

@@ -1,0 +1,29 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Route A" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [105.800, 21.000, 100],
+          [105.805, 21.002, 120],
+          [105.810, 21.004, 150]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Route B" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [105.810, 21.004, 150],
+          [105.815, 21.008, 200],
+          [105.820, 21.012, 250]
+        ]
+      }
+    }
+  ]
+}

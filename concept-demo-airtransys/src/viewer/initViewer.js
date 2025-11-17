@@ -21,9 +21,9 @@ export function initViewer(containerId) {
 
         //sceneMode: Cesium.SceneMode.SCENE2D, // bản đồ 2D
 
-        // imageryProvider: new Cesium.UrlTemplateImageryProvider({
-        //     url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-        // }),
+        imageryProvider: new Cesium.UrlTemplateImageryProvider({
+            url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        }),
         baseLayerPicker: false,
         timeline: false,
         animation: false,
@@ -33,13 +33,13 @@ export function initViewer(containerId) {
         terrainProvider: new Cesium.EllipsoidTerrainProvider(),
     });
 
-    const layer = viewer.imageryLayers.addImageryProvider(
-        new Cesium.UrlTemplateImageryProvider({
-            url: './assets/satellite/{z}/{x}/{y}.jpeg',
-            minimumLevel: 0,
-            maximumLevel: 22
-        })
-    );
+    // const layer = viewer.imageryLayers.addImageryProvider(
+    //     new Cesium.UrlTemplateImageryProvider({
+    //         url: './assets/satellite/{z}/{x}/{y}.jpeg',
+    //         minimumLevel: 0,
+    //         maximumLevel: 22
+    //     })
+    // );
 
     // //viewer.scene.globe.enableLighting = true;
     viewer.scene.backgroundColor = Cesium.Color.GRAY;

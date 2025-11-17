@@ -133,15 +133,28 @@ export async function loadOsmData(viewer, url) {
   //   }
   // });
 
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(105.53144970995119, 20.999432599375684, 268.8832091417887),
-    orientation: {
-      heading: Cesium.Math.toRadians(67.89153225404225),
-      pitch: Cesium.Math.toRadians(-23.859788354461987),
-      roll: 0.003603240879509745
-    }
-  });
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(105.53144970995119, 20.999432599375684, 268.8832091417887),
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(67.89153225404225),
+  //     pitch: Cesium.Math.toRadians(-23.859788354461987),
+  //     roll: 0.003603240879509745
+  //   }
+  // });
 
+  // 4_1
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(
+      105.53548541312759,
+      20.9990280442799,
+      96.46895209308201
+    ),
+    orientation: {
+      heading: Cesium.Math.toRadians(19.038724598594925),
+      pitch: Cesium.Math.toRadians(-13.382623875288926),
+      roll: 0.007556491718236655,
+    },
+  });
 
   // const controller = viewer.scene.screenSpaceCameraController;
   // controller.enableRotate = false;

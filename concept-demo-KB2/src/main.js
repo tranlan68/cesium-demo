@@ -25,7 +25,7 @@ loadOsmData(viewer, "./assets/maps/hoalac1.json").then(() => {
 });
 
 // --- 3️⃣ Load và hiển thị network ---
-drawNetwork(viewer, "./assets/maps/flight_paths_detailed_4_1.json", 10).then(
+drawNetwork(viewer, "./assets/maps/flight_paths_detailed_4_2.json", 11).then(
   () => {
     //enableNodeSelection(viewer);
     console.log("Network loaded ✅ Click 2 nodes to draw shortest path.");
@@ -47,16 +47,14 @@ function showNotification() {
   toastContent.innerHTML = `
     <div style="position: relative; display:flex; justify-content: space-between; align-items: top;">
       <div>
-        Vị trí mô phỏng: Khu Công nghệ cao Hòa Lạc <br>
-        Tọa độ các điểm cắt hạ cánh: <br>
-          - VMC: Tọa độ [21.0016758, 105.5369555] <br>
-          - Sau Trung tâm tài chính (TTTC): Tọa độ [21.0048467, 105.5278548] <br>
-          - Trước tòa NIC: Tọa độ [21.0100584, 105.5304694] <br>
+        Mô phỏng tình huống tăng độ cao để tránh va chạm giữa 2 drone tại Khu Công nghệ cao Hòa Lạc <br>
+        Tọa độ các điểm: <br>
+          - P1: 21.003083, 105.537444 <br>
+          - P2: 21.000056, 105.53375 <br>
+          - P3: 21.00175, 105.532972 <br>
         Thông tin bay: <br>
-          - Drone A: Bay từ VMC tới TTTC <br>
-          - Drone B: Bay từ TTTC tới VMC <br>
-          - Drone B xuất phát sau Drone A 5s <br>
-          - Khoảng cách từ VMC tới TTTC: ~860m <br>
+          - Drone A: Cất cánh tại điểm P1, tăng dần độ cao lên 25m. Đi qua các điểm P2, P3 và trở về P1 <br>
+          - Drone B: Cất cánh sau Drone A 5s, tại điểm P1, tăng dần độ cao lên 25m. Đi qua các điểm P3, P2 và trở về P1 <br>
       </div>
       <button id="closeToast" style="
         position: absolute;

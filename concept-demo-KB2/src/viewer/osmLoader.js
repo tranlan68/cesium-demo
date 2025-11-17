@@ -163,16 +163,30 @@ export async function loadOsmData(viewer, url) {
   // 4_2
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(
-      105.53513349050885,
-      20.995869442063338,
-      267.30130266831696
+      105.53245448630689,
+      20.998917610466215,
+      73.11205391801181
     ),
     orientation: {
-      heading: Cesium.Math.toRadians(2.1889560866446303),
-      pitch: Cesium.Math.toRadians(-25.51606658836522),
-      roll: 0.0006127,
+      heading: Cesium.Math.toRadians(29.592641956031866),
+      pitch: Cesium.Math.toRadians(-9.43119672161522),
+      roll: 0.0007741533235562625,
     },
   });
+
+  // // 4_1
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(
+  //     105.53547898784254,
+  //     20.998233766442777,
+  //     120.49922314828953
+  //   ),
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(19.038724556214312),
+  //     pitch: Cesium.Math.toRadians(-13.382623359096758),
+  //     roll: 0.000131888856114918,
+  //   },
+  // });
 
   // const controller = viewer.scene.screenSpaceCameraController;
   // controller.enableRotate = false;

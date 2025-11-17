@@ -177,7 +177,7 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
 
     if (i < changeTime) {
       try {
-        offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+        offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
         let position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt + offsetArray[i]);
         let time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
         property.addSample(time, position);
@@ -187,14 +187,14 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
         console.error("Error adding sample at i =", i, "wp:", wp, e);
       }
     } else if (i === changeTime) {
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
       let position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt + offsetArray[i]);
       let time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
       property.addSample(time, position);
       t += 1;
 
       i++;
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
       wp = waypoints[i];
       let position2 = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + (offsetAlt2 + offsetAlt) / 2 + offsetArray[i]);
       let time2 = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
@@ -202,7 +202,7 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
       t += 1;
 
       i++;
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
       wp = waypoints[i];
       let position3 = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt2 + offsetArray[i]);
       let time3 = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
@@ -210,7 +210,7 @@ export function animateDroneAlongPath(viewer, drone, waypoints, color, offsetAlt
       t += 1;
 
     } else {
-      offsetArray.push(Math.round((Math.random() * 4) / 0.1) * 0.1 - 2);
+      offsetArray.push(Math.round((Math.random() * 0.8) / 0.1) * 0.1 - 0.4);
       let position = Cesium.Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt + offsetAlt2 + offsetArray[i]);
       let time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
       property.addSample(time, position);
