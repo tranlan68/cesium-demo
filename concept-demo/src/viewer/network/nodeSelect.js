@@ -138,7 +138,7 @@ export async function startScenario(viewer, timerDisplay) {
         if (positionDroneA && positionDroneB) {
           let d = distance(positionDroneA, positionDroneB);
           console.log("Khoảng cách:", d.toFixed(2), "m");
-          if (d < 40 && elapsed > 20) {
+          if (d < 50 && elapsed > 20) {
             //console.log("⚠️ Drone sắp gặp nhau! Khoảng cách:", d.toFixed(2), "m");
             // Tọa độ trung điểm để show cảnh báo
             let midPos = interpolate(positionDroneA, positionDroneB, 0.5);

@@ -112,9 +112,9 @@ export function initViewer(containerId) {
         const heading = Cesium.Math.toDegrees(viewer.camera.heading);
         const pitch = Cesium.Math.toDegrees(viewer.camera.pitch);
         const roll = Cesium.Math.toDegrees(viewer.camera.roll);
-        // console.log(
-        //   `lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}, roll: ${roll}`
-        // );
+        console.log(
+          `lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}, roll: ${roll}`
+        );
       }
     } catch (error) {
       console.error("Error getting camera position: ", error);
