@@ -50,7 +50,7 @@ function showNotification() {
       Mô phỏng tình huống tăng độ cao để tránh va chạm giữa 2 drone tại Khu Công nghệ cao Hòa Lạc <br>
       Tọa độ các điểm: <br>
         - P1: 21.003083, 105.537444 <br>
-        - P2: 21.001636, 105.538069 <br>
+        - P2: 21.001667, 105.538028 <br>
         - P3: 21.00075, 105.536027 <br>
         - P4: 21.001833, 105.535333 <br>
       Thông tin bay: <br>

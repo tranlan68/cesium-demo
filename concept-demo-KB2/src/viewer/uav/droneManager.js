@@ -350,8 +350,7 @@ export function animateDroneAlongPath(
                       waypoints[i].alt + offsetAlt + offsetArray[i]
                     )
                   );
-                  i++;
-                  new Promise((resolve) => setTimeout(resolve, 1000));
+                } else if (i === changeTime + 1) {
                   positions.push(
                     Cesium.Cartesian3.fromDegrees(
                       waypoints[i].lng,
@@ -361,8 +360,7 @@ export function animateDroneAlongPath(
                         offsetArray[i]
                     )
                   );
-                  i++;
-                  new Promise((resolve) => setTimeout(resolve, 1000));
+                } else if (i === changeTime + 2) {
                   positions.push(
                     Cesium.Cartesian3.fromDegrees(
                       waypoints[i].lng,

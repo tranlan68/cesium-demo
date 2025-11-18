@@ -54,7 +54,7 @@ function drawNodes(viewer, nodes, radius = 15) {
       properties: new Cesium.PropertyBag({ type: "node" }),
     });
 
-    if (node.id === "P1") {
+    if (node.id === "P1" || node.id === "P5") {
       // cot
       let positions = [];
       positions.push(Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 0));
@@ -70,13 +70,13 @@ function drawNodes(viewer, nodes, radius = 15) {
         //   shape: createCircleShape(radius, 32, 1),
         //   material: Cesium.Color.CYAN.withAlpha(0.2),
         // },
-        position: Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 10), // 5 = center
-    cylinder: {
-        length: 30,
-        topRadius: 20,
-        bottomRadius: 20,
-        material: Cesium.Color.CYAN.withAlpha(0.2)
-    }
+        position: Cesium.Cartesian3.fromDegrees(node.lng, node.lat, 15), // 5 = center
+        cylinder: {
+          length: 40,
+          topRadius: 20,
+          bottomRadius: 20,
+          material: Cesium.Color.CYAN.withAlpha(0.2),
+        },
       });
 
       // Đánh dấu là edge để loại bỏ khi click
