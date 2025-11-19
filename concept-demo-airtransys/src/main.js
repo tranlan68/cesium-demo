@@ -199,7 +199,7 @@ function showOrUpdatePopup(id, position, message) {
       position: position, // Cesium.Cartesian3
       label: {
         text: `⚠️  ${message}`,
-        font: "12px sans-serif",
+        font: "14px sans-serif",
         fillColor: Cesium.Color.RED,
         style: Cesium.LabelStyle.FILL_AND_OUTLINE,
         outlineWidth: 2,
@@ -220,8 +220,8 @@ function showOrUpdatePopup(id, position, message) {
   return popup;
 }
 function getNextScale(id) {
-  const current = scaleState.get(id) || 0.5;
-  const next = current === 0.5 ? 1 : 0.5;
+  const current = scaleState.get(id) || 0.8;
+  const next = current === 0.8 ? 1 : 0.8;
   scaleState.set(id, next);
   return next;
 }
@@ -233,7 +233,7 @@ function resetPopupTimer(id) {
   // tạo timer mới 5s
   let timeout = setTimeout(() => {
     hidePopup(id);
-  }, 10000);
+  }, 15000);
   timers.set(id, timeout);
 }
 function hidePopup(id) {

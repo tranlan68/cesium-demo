@@ -157,16 +157,28 @@ export async function loadOsmData(viewer, url) {
   // });
 
   // 4_2
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(
+  //     105.53152514254529,
+  //     20.998913261243537,
+  //     154.23613660690117
+  //   ),
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(51.022668900149895),
+  //     pitch: Cesium.Math.toRadians(-18.14674394535847),
+  //     roll: 0.00005654975650278254,
+  //   },
+  // });
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(
-      105.53152514254529,
-      20.998913261243537,
-      154.23613660690117
+      105.53961686532188,
+      21.000148097548745,
+      161.6481807371821
     ),
     orientation: {
-      heading: Cesium.Math.toRadians(51.022668900149895),
-      pitch: Cesium.Math.toRadians(-18.14674394535847),
-      roll: 0.00005654975650278254,
+      heading: Cesium.Math.toRadians(298.35229565813233),
+      pitch: Cesium.Math.toRadians(-12.870013703594166),
+      roll: 0.0008202399092759065,
     },
   });
 

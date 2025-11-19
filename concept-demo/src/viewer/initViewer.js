@@ -33,13 +33,14 @@ export function initViewer(containerId) {
     terrainProvider: new Cesium.EllipsoidTerrainProvider(),
   });
 
-  //   const layer = viewer.imageryLayers.addImageryProvider(
-  //     new Cesium.UrlTemplateImageryProvider({
-  //       url: "./assets/satellite/{z}/{x}/{y}.jpeg",
-  //       minimumLevel: 0,
-  //       maximumLevel: 22,
-  //     })
-  //   );
+    const layer = viewer.imageryLayers.addImageryProvider(
+      new Cesium.UrlTemplateImageryProvider({
+        url: "./assets/satellite/{z}/{x}/{y}.jpeg",
+        minimumLevel: 0,
+        maximumLevel: 22,
+      })
+    );
+  layer.alpha = 0.3;
 
   // //viewer.scene.globe.enableLighting = true;
   viewer.scene.backgroundColor = Cesium.Color.GRAY;
@@ -112,9 +113,9 @@ export function initViewer(containerId) {
         const heading = Cesium.Math.toDegrees(viewer.camera.heading);
         const pitch = Cesium.Math.toDegrees(viewer.camera.pitch);
         const roll = Cesium.Math.toDegrees(viewer.camera.roll);
-        // console.log(
-        //   `lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}, roll: ${roll}`
-        // );
+        console.log(
+          `lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}, roll: ${roll}`
+        );
       }
     } catch (error) {
       console.error("Error getting camera position: ", error);

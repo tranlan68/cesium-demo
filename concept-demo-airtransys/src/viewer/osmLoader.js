@@ -143,16 +143,53 @@ export async function loadOsmData(viewer, url) {
   // });
 
   // 4_1
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(
+  //     105.53548541312759,
+  //     20.9990280442799,
+  //     96.46895209308201
+  //   ),
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(19.038724598594925),
+  //     pitch: Cesium.Math.toRadians(-13.382623875288926),
+  //     roll: 0.007556491718236655,
+  //   },
+  // });
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(
+  //     105.5347244508244,
+  //     20.99956140716113,
+  //     93.94437649509513
+  //   ),
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(33.048508707434785),
+  //     pitch: Cesium.Math.toRadians(-11.403760826631325),
+  //     roll: 0.000003136384410269224,
+  //   },
+  // });
+  // viewer.camera.flyTo({
+  //   destination: Cesium.Cartesian3.fromDegrees(
+  //     105.53946167615203,
+  //     21.001500121639747,
+  //     86.94612182038972
+  //   ),
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(284.478046896761),
+  //     pitch: Cesium.Math.toRadians(-9.095212626432094),
+  //     roll: 0.0,
+  //   },
+  // });
+
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(
-      105.53548541312759,
-      20.9990280442799,
-      96.46895209308201
+      105.53975223681428,
+      21.002891859528088,
+      91.88175619768927
     ),
     orientation: {
-      heading: Cesium.Math.toRadians(19.038724598594925),
-      pitch: Cesium.Math.toRadians(-13.382623875288926),
-      roll: 0.007556491718236655,
+      heading: Cesium.Math.toRadians(258.01399381026414),
+      pitch: Cesium.Math.toRadians(-9.720035322440147),
+      roll: -0.001475605,
     },
   });
 

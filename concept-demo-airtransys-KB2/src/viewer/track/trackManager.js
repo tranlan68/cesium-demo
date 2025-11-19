@@ -9,6 +9,7 @@ import {
   getDrone,
 } from "/src/viewer/uav/droneManager.js";
 
+let history = {};
 let dronePaths = {};
 
 export async function updateTracks(viewer) {
@@ -106,19 +107,45 @@ function updateDronePositions(viewer, tracks) {
   });
 }
 function addHistoryPoint(viewer, id, pos) {
-  const pointEntity = viewer.entities.add({
-    id: `history_${id}_${Date.now()}`,
-    position: pos,
-    point: {
-      pixelSize: 2,
-      color: Cesium.Color.YELLOW,
-      outlineColor: Cesium.Color.BLACK,
-      outlineWidth: 1,
-    },
-  });
+  try {
+    if (!history[id]) history[id] = [];
+    history[id].push(pos);
+  
+    let positions = history[id];
+    if (!positions || positions.length < 2) {
+        return;
+    }
 
-  if (!dronePaths[id]) dronePaths[id] = [];
-  dronePaths[id].push(pointEntity);
+    console.error("positions: ", positions);
+    let p1 = positions[positions.length - 2];
+    let p2 = positions[positions.length - 1];
+    console.error("p1: ", p1);
+    console.error("p2: ", p1);
+    if (p1 && p2) {
+    let pointEntity = viewer.entities.add({
+        polyline: {
+          positions: [p1, p2],
+          width: 1,
+          material: Cesium.Color.YELLOW
+        }
+    });
+
+    // const pointEntity = viewer.entities.add({
+    //   id: `history_${id}_${Date.now()}`,
+    //   position: pos,
+    //   point: {
+    //     pixelSize: 2,
+    //     color: Cesium.Color.YELLOW,
+    //     outlineColor: Cesium.Color.BLACK,
+    //     outlineWidth: 1,
+    //   },
+    // });
+
+    if (!dronePaths[id]) dronePaths[id] = [];
+    dronePaths[id].push(pointEntity);
+    }
+  } catch (err) {
+  }
 }
 
 function clearHistory(viewer, id) {

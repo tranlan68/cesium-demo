@@ -31,7 +31,7 @@ function drawNodes(viewer, nodes, radius = 15) {
       id: node.id,
       position,
       model: {
-        uri: "./assets/models/postbox.glb",
+        //uri: "./assets/models/postbox.glb",
         scale: 0.5,
         minimumPixelSize: 40, // đảm bảo nhìn rõ khi zoom xa
         //heightReference: Cesium.HeightReference.NONE, // luôn thấy node
@@ -46,7 +46,7 @@ function drawNodes(viewer, nodes, radius = 15) {
       // },
       label: {
         text: node.id,
-        font: "10px sans-serif",
+        font: "12px sans-serif",
         fillColor: Cesium.Color.BLUE,
         pixelOffset: new Cesium.Cartesian2(0, -20),
         disableDepthTestDistance: Number.POSITIVE_INFINITY,

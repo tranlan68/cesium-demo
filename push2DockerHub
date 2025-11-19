@@ -1,0 +1,10 @@
+docker login
+
+docker tag fe-3d-concept:2025.11.19 tranlan68/fe-3d-concept:2025.11.19
+docker push tranlan68/fe-3d-concept:2025.11.19
+
+docker tag at-3d-realdata:2025.11.19 tranlan68/fe-3d-kb1:2025.11.19
+docker push tranlan68/fe-3d-kb1:2025.11.19
+
+docker tag at-3d-realdata2:2025.11.19 tranlan68/fe-3d-kb2:2025.11.19
+docker push tranlan68/fe-3d-kb2:2025.11.19
