@@ -53,7 +53,7 @@ const scaleState = new Map();
 //test();
 
 const wsTacticalConflict = connectWS(
-  "wss://airtransys.site:9443/at-drone/ws/tactical-conflict",
+  "wss://airtransys.site:9443/at-drone-2/ws/tactical-conflict",
   (msg) => {
     const data = JSON.parse(msg);
     console.log("tactical-conflict:", data);
@@ -95,7 +95,7 @@ const wsTacticalConflict = connectWS(
 );
 
 const wsFlightContainment = connectWS(
-  "wss://airtransys.site:9443/at-drone/ws/flight-containment",
+  "wss://airtransys.site:9443/at-drone-2/ws/flight-containment",
   (msg) => {
     let data = JSON.parse(msg);
 
