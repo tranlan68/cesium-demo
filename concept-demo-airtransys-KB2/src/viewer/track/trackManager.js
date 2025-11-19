@@ -57,7 +57,7 @@ function updateDronePositions(viewer, tracks) {
       let position = Cesium.Cartesian3.fromDegrees(
         track.position.longitude,
         track.position.latitude,
-        track.position.altitude //- 32
+        track.position.altitude - 32
       );
       let drone = getDrone(track.object_track_id);
       //if (!isExist(track.object_track_id)) {

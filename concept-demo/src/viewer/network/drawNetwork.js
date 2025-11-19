@@ -46,7 +46,7 @@ function drawNodes(viewer, nodes, radius = 15) {
       // },
       label: {
         text: node.id,
-        font: "12px sans-serif",
+        font: "14px sans-serif",
         fillColor: Cesium.Color.BLUE,
         pixelOffset: new Cesium.Cartesian2(0, -20),
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
