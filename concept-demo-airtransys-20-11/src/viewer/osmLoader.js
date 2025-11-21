@@ -122,7 +122,7 @@ export async function loadOsmData(viewer, url) {
       entity.polygon.outline = true;
       entity.polygon.outlineColor = Cesium.Color.DARKGREEN;
     } else if (highway && entity.polyline) {
-      let color = getHighwayColor();
+      let color = getHighwayColor(highway);
       entity.polyline.material = new Cesium.ColorMaterialProperty(color);
       entity.polyline.width = 2;
       entity.polyline.clampToGround = true;
