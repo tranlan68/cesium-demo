@@ -13,20 +13,20 @@ export function initViewer(containerId: string) {
     terrainProvider: new Cesium.EllipsoidTerrainProvider(),
   });
 
-//   viewer.imageryLayers.addImageryProvider(
-//   new Cesium.UrlTemplateImageryProvider({
-//     url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-//   })
-// );
-
-  const layer = viewer.imageryLayers.addImageryProvider(
+    viewer.imageryLayers.addImageryProvider(
     new Cesium.UrlTemplateImageryProvider({
-      url: "./assets/satellite/{z}/{x}/{y}.jpeg",
-      minimumLevel: 0,
-      maximumLevel: 22,
+      url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
     })
   );
-  layer.alpha = 0.3;
+
+  // const layer = viewer.imageryLayers.addImageryProvider(
+  //   new Cesium.UrlTemplateImageryProvider({
+  //     url: "./assets/satellite/{z}/{x}/{y}.jpeg",
+  //     minimumLevel: 0,
+  //     maximumLevel: 22,
+  //   })
+  // );
+  // layer.alpha = 0.3;
 
   viewer.scene.backgroundColor = Cesium.Color.GRAY;
   viewer.scene.globe.baseColor = Cesium.Color.LIGHTGREY;
@@ -38,14 +38,20 @@ export function initViewer(containerId: string) {
   controller.enableLook = true;
   controller.minimumZoomDistance = 1.0;
   controller.maximumZoomDistance = 1e9;
-//   controller.minimumPitch = Cesium.Math.toRadians(0);
-//   controller.maximumPitch = Cesium.Math.toRadians(90);
+  //   controller.minimumPitch = Cesium.Math.toRadians(0);
+  //   controller.maximumPitch = Cesium.Math.toRadians(90);
+
+  // Tat light
+  viewer.scene.light = new Cesium.DirectionalLight({
+    direction: new Cesium.Cartesian3(1, 1, 1)
+  });
+  viewer.shadows = false;
 
   // Ẩn Cesium credit
   if (viewer && viewer.cesiumWidget && viewer.cesiumWidget.creditContainer) {
     (viewer.cesiumWidget.creditContainer as HTMLElement).style.display = "none";
   }
-  
+
   // // Bắt sự kiện click chuột trái
   // const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
   //   handler.setInputAction(
@@ -98,9 +104,9 @@ export function initViewer(containerId: string) {
       const pitch = Cesium.Math.toDegrees(viewer.camera.pitch);
       const roll = Cesium.Math.toDegrees(viewer.camera.roll);
 
-      console.log(
-        `lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}, roll: ${roll}`
-      );
+      // console.log(
+      //   `lon: ${lon}, lat: ${lat}, height: ${height}, heading: ${heading}, pitch: ${pitch}, roll: ${roll}`
+      // );
     } catch (e) {
       console.error(e);
     }

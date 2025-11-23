@@ -1,5 +1,6 @@
 import * as Cesium from "cesium";
 import { createCylinderBetween, createCircleShape } from "/src/cesium/geometry";
+import {ROUTE_COLOR} from "/src/constants";
 
 export interface Waypoint {
   lng: number;
@@ -35,7 +36,11 @@ declare global {
   }
 }
 
-export async function drawNetwork(viewer: Cesium.Viewer, url: string, radius = 300) {
+export async function drawNetwork(viewer: Cesium.Viewer, url: string, height = 300, witth = 300) {
+  if (!viewer) {
+    console.error("drawNetwork: viewer is undefined");
+    return;
+  }
   const res = await fetch(url);
   const data = await res.json();
 
@@ -45,7 +50,7 @@ export async function drawNetwork(viewer: Cesium.Viewer, url: string, radius = 3
 
   const routes: Route[] = data.routes;
 
-  drawRoutes(viewer, routes, radius);
+  drawRoutes(viewer, routes, height, witth);
   drawNodes(viewer, nodes);
 
   window.__network = { viewer, nodes, nodeMap, routes };
@@ -80,7 +85,7 @@ function drawNodes(viewer: Cesium.Viewer, nodes: Node[], radius = 15) {
           length: 30,
           topRadius: 20,
           bottomRadius: 20,
-          material: Cesium.Color.CYAN.withAlpha(0.2),
+          material: ROUTE_COLOR,
         },
       });
       edgeEntity.properties = new Cesium.PropertyBag({ type: "edge" });
@@ -89,14 +94,14 @@ function drawNodes(viewer: Cesium.Viewer, nodes: Node[], radius = 15) {
 }
 
 // --- Vẽ routes ---
-function drawRoutes(viewer: Cesium.Viewer, routes: Route[], radius = 150) {
+function drawRoutes(viewer: Cesium.Viewer, routes: Route[], height = 150, width = 150) {
   routes.forEach((route) => {
     const positions = route.path.map((p) => Cesium.Cartesian3.fromDegrees(p.lng, p.lat, 25));
-    const edgeEntity = viewer.entities.add({
+    const edgeEntity = viewer?.entities?.add({
       polylineVolume: {
         positions,
-        shape: createCircleShape(radius),
-        material: Cesium.Color.CYAN.withAlpha(0.2),
+        shape: createCircleShape(height, width),
+        material: ROUTE_COLOR,
       },
     });
     edgeEntity.properties = new Cesium.PropertyBag({ type: "edge" });

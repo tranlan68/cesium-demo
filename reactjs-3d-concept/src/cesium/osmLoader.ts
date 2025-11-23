@@ -8,6 +8,27 @@ import {
   getHighwayColor,
 } from "/src/utils/colors";
 
+function createTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  ctx.fillStyle = "#faf8f8ff";
+  ctx.fillRect(0, 0, 256, 256);
+
+  ctx.fillStyle = "#a0d2f3ff";
+  for (let y = 10; y < 256; y += 40) {
+    for (let x = 10; x < 256; x += 40) {
+      ctx.fillRect(x, y, 20, 20);
+    }
+  }
+
+  return canvas.toDataURL();
+}
+
+
 export async function loadOsmData(
   viewer: Cesium.Viewer,
   url: string
@@ -22,7 +43,10 @@ export async function loadOsmData(
     clampToGround: true,
   });
 
+  if (!viewer) return;
   viewer.dataSources.add(dataSource);
+
+  const texture = createTexture();
 
   dataSource.entities.values.forEach((entity) => {
     const props = entity.properties;
@@ -39,80 +63,145 @@ export async function loadOsmData(
 
     // 🏠 Tòa nhà
     if (building && entity.polygon) {
-      const height = parseFloat(get("height") || 0);
-      const levels = parseInt(get("building:levels") || 0);
-      const ele = parseFloat(get("ele") || 0);
+      // chỉ xử lý Polygon có tag building
+      if (!entity.polygon) return;
+      if (!entity.properties || !entity.properties.building) return;
 
-      const roofColor = convertColor(get("roof:colour"));
-      const wallColor = convertColor(get("building:colour")) || "#ffe680";
-      const roofShape = get("roof:shape") || "flat";
+      // chiều cao mặc định nếu không có dữ liệu thật
+      let height = 5;
+      if (entity.properties.height) {
+        height = parseFloat(entity.properties.height.getValue());
+      } else if (entity.properties["building:levels"]) {
+        height = parseInt(entity.properties["building:levels"].getValue()) * 3.2;
+      }
 
-      const buildingHeight = height || (levels ? levels * 3 : 8);
-      const roofHeight = roofShape === "flat" ? 0.5 : 1.5;
-      const color = getBuildingColor(
-        building,
-        convertColor(get("building:colour")),
-        buildingHeight
-      );
+      // Apply vật liệu + extrude
+      entity.polygon.material = new Cesium.ImageMaterialProperty({
+        image: texture,
+        repeat: new Cesium.Cartesian2(4, 2)
+      });
 
-      entity.polygon.height = new Cesium.ConstantProperty(ele);
-      entity.polygon.extrudedHeight = new Cesium.ConstantProperty(ele + buildingHeight);
-      entity.polygon.material = new Cesium.ColorMaterialProperty(Cesium.Color.fromCssColorString(color).withAlpha(1.0));
+      entity.polygon.extrudedHeight = new Cesium.ConstantProperty(height);
+      entity.polygon.height = new Cesium.ConstantProperty(0);
       entity.polygon.outline = new Cesium.ConstantProperty(true);
       entity.polygon.outlineColor = new Cesium.ConstantProperty(Cesium.Color.BLACK);
 
-      // Mái
-      if (roofColor) {
+      const levels = parseInt(get("building:levels") || 0);
+      // const buildingHeight = height || (levels ? levels * 3 : 5);
+      // const color = getBuildingColor(
+      //   building,
+      //   convertColor(get("building:colour")),
+      //   buildingHeight
+      // );
+      for (let i = 0; i < levels; i++) {
         viewer.entities.add({
           polygon: {
             hierarchy: entity.polygon.hierarchy,
-            height: ele + buildingHeight,
-            extrudedHeight: ele + buildingHeight + roofHeight,
-            material: Cesium.Color.fromCssColorString(roofColor),
-            outline: false,
-          },
-        });
-      }
-
-      // Mái nghiêng (gabled/hipped)
-      if (roofShape === "gabled" || roofShape === "hipped") {
-          if (entity.polygon && entity.polygon.hierarchy) {
-              const hierarchy = entity.polygon.hierarchy.getValue(Cesium.JulianDate.now());
-              const positions = hierarchy.positions;
-        const midIndex = Math.floor(positions.length / 2);
-
-        const sideA = positions.slice(0, midIndex + 1);
-        const sideB = positions.slice(midIndex);
-
-        const center = Cesium.BoundingSphere.fromPoints(positions).center;
-        const roofTop = Cesium.Cartesian3.add(
-          center,
-          new Cesium.Cartesian3(0, 0, roofHeight * 1.5),
-          new Cesium.Cartesian3()
-        );
-
-        const roofAEntity = viewer.entities.add({
-          polygon: {
-            hierarchy: new Cesium.PolygonHierarchy([...sideA, roofTop] ),
-            height: ele + buildingHeight,
-          },
-        });
-        const roofBEntity = viewer.entities.add({
-          polygon: {
-            hierarchy: new Cesium.PolygonHierarchy([...sideB, roofTop]),
-            height: ele + buildingHeight,
-          },
-        });
-              if (roofColor) {
-                  if (roofAEntity.polygon) {
-                      roofAEntity.polygon.material = new Cesium.ColorMaterialProperty(Cesium.Color.fromCssColorString(roofColor).withAlpha(0.95));
-                  }
-                  if (roofBEntity.polygon) {
-                      roofBEntity.polygon.material = new Cesium.ColorMaterialProperty(Cesium.Color.fromCssColorString(roofColor).withAlpha(0.95));
-                  }
-              }
+            height: i * (levels ? 3 : 5),
+            extrudedHeight: (i + 1) * (levels ? 3 : 5),
+            material: Cesium.Color.fromCssColorString("#faf8f8ff"), // màu ngẫu nhiên mỗi tầng
+            outline: true,
+            outlineColor: Cesium.Color.BLACK
           }
+        });
       }
+
+      // Optional: thêm mái nhà
+      viewer.entities.add({
+        polygon: {
+          hierarchy: entity.polygon.hierarchy,
+          height: height,
+          material: Cesium.Color.DARKGRAY
+        }
+      });
+
+      // const height = parseFloat(get("height") || 0);
+      // const levels = parseInt(get("building:levels") || 0);
+      // const ele = parseFloat(get("ele") || 0);
+
+      // const roofColor = convertColor(get("roof:colour"));
+      // const wallColor = convertColor(get("building:colour")) || "#ffe680";
+      // const roofShape = get("roof:shape") || "flat";
+
+      // const buildingHeight = height || (levels ? levels * 3 : 5);
+      // const roofHeight = roofShape === "flat" ? 0.5 : 1.5;
+      // const color = getBuildingColor(
+      //   building,
+      //   convertColor(get("building:colour")),
+      //   buildingHeight
+      // );
+
+      // entity.polygon.height = new Cesium.ConstantProperty(ele);
+      // entity.polygon.extrudedHeight = new Cesium.ConstantProperty(ele + buildingHeight);
+      // entity.polygon.material = new Cesium.ColorMaterialProperty(Cesium.Color.fromCssColorString(color).withAlpha(1.0));
+      // entity.polygon.outline = new Cesium.ConstantProperty(true);
+      // entity.polygon.outlineColor = new Cesium.ConstantProperty(Cesium.Color.BLACK);
+
+      // for (let i = 0; i < levels; i++) {
+      //   viewer.entities.add({
+      //     polygon: {
+      //       hierarchy: entity.polygon.hierarchy,
+      //       height: i * (levels ? 3 : 5),
+      //       extrudedHeight: (i + 1) * (levels ? 3 : 5),
+      //       material: Cesium.Color.fromCssColorString(color), // màu ngẫu nhiên mỗi tầng
+      //       outline: true,
+      //       outlineColor: Cesium.Color.BLACK
+      //     }
+      //   });
+      // }
+
+      // // Mái
+      // if (roofColor) {
+      //   viewer.entities.add({
+      //     polygon: {
+      //       hierarchy: entity.polygon.hierarchy,
+      //       height: ele + buildingHeight,
+      //       extrudedHeight: ele + buildingHeight + roofHeight,
+      //       material: Cesium.Color.fromCssColorString(roofColor),
+      //       outline: false,
+      //     },
+      //   });
+      // }
+
+      // // Mái nghiêng (gabled/hipped)
+      // if (roofShape === "gabled" || roofShape === "hipped") {
+      //     if (entity.polygon && entity.polygon.hierarchy) {
+      //         const hierarchy = entity.polygon.hierarchy.getValue(Cesium.JulianDate.now());
+      //         const positions = hierarchy.positions;
+      //   const midIndex = Math.floor(positions.length / 2);
+
+      //   const sideA = positions.slice(0, midIndex + 1);
+      //   const sideB = positions.slice(midIndex);
+
+      //   const center = Cesium.BoundingSphere.fromPoints(positions).center;
+      //   const roofTop = Cesium.Cartesian3.add(
+      //     center,
+      //     new Cesium.Cartesian3(0, 0, roofHeight * 1.5),
+      //     new Cesium.Cartesian3()
+      //   );
+
+      //   const roofAEntity = viewer.entities.add({
+      //     polygon: {
+      //       hierarchy: new Cesium.PolygonHierarchy([...sideA, roofTop] ),
+      //       height: ele + buildingHeight,
+      //     },
+      //   });
+      //   const roofBEntity = viewer.entities.add({
+      //     polygon: {
+      //       hierarchy: new Cesium.PolygonHierarchy([...sideB, roofTop]),
+      //       height: ele + buildingHeight,
+      //     },
+      //   });
+      //         if (roofColor) {
+      //             if (roofAEntity.polygon) {
+      //                 roofAEntity.polygon.material = new Cesium.ColorMaterialProperty(Cesium.Color.fromCssColorString(roofColor).withAlpha(0.95));
+      //             }
+      //             if (roofBEntity.polygon) {
+      //                 roofBEntity.polygon.material = new Cesium.ColorMaterialProperty(Cesium.Color.fromCssColorString(roofColor).withAlpha(0.95));
+      //             }
+      //         }
+      //     }
+      // }
     }
     // Nước
     else if ((natural === "water" || water) && entity.polygon) {

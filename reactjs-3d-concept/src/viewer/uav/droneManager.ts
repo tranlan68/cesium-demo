@@ -93,7 +93,10 @@ export function animateDroneAlongPath(
   offsetAlt: number,
   offsetAlt2: number
 ) {
-  if (!drone || !waypoints || waypoints.length === 0) return;
+  if (!drone || !waypoints || waypoints.length === 0) {
+    console.warn("⚠️ animateDroneAlongPath: Drone hoặc path không hợp lệ");
+    return;
+  }
 
   const changeTime = 44;
   const property = new Cesium.SampledPositionProperty();
@@ -121,46 +124,76 @@ export function animateDroneAlongPath(
   }
 
   drone.position = property;
-  drone.orientation = new Cesium.VelocityOrientationProperty(property);
+  //drone.orientation = new Cesium.VelocityOrientationProperty(property);
+  drone.orientation = new Cesium.CallbackPositionProperty(function (
+    time,
+    result
+  ) {
+    try {
+      let position = drone.position?.getValue(time);
+      if (position) {
+        let heading = 0;
+        return Cesium.Transforms.headingPitchRollQuaternion(
+          position,
+          new Cesium.HeadingPitchRoll(heading, 0, 0)
+        );
+      }
+    } catch (e) {
+      console.error("Error in orientation callback:", e);
+    }
+  }, false);
 
   viewer.clock.startTime = start.clone();
-  viewer.clock.stopTime = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+  viewer.clock.stopTime = Cesium.JulianDate.addSeconds(start, waypoints.length, new Cesium.JulianDate());
   viewer.clock.currentTime = start.clone();
   viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;
   viewer.clock.multiplier = 1;
   viewer.clock.shouldAnimate = true;
 
   // highlight đường đi drone
-  const highlightEntity = viewer.entities.add({
+  let highlightEntity = viewer.entities.add({
     name: "Drone Path Highlight",
     polyline: {
       positions: new Cesium.CallbackProperty(() => {
-        const positions: Cesium.Cartesian3[] = [];
-        const currentTime = viewer.clock.currentTime;
-        for (let i = 0; i < waypoints.length; i++) {
-          const sampleTime = Cesium.JulianDate.addSeconds(start, i, new Cesium.JulianDate());
-          if (Cesium.JulianDate.lessThanOrEquals(sampleTime, currentTime)) {
-            let wp = waypoints[i];
-            let altOffset = offsetAlt;
-            if (i > changeTime) altOffset = offsetAlt2;
-            if (i === changeTime + 1) altOffset = (offsetAlt + offsetAlt2) / 2;
-            positions.push(
-              Cesium.Cartesian3.fromDegrees(
-                wp.lng,
-                wp.lat,
-                wp.alt + altOffset + offsetArray[i]
-              )
+          try {
+            let positions: Cesium.Cartesian3[] = [];
+            let currentTime = Cesium.JulianDate.now();
+
+            // khi hết đường, remove entity
+            let end = Cesium.JulianDate.addSeconds(
+              start,
+              waypoints.length,
+              new Cesium.JulianDate()
             );
-          } else break;
-        }
-        // khi hết đường, remove entity
-        if (Cesium.JulianDate.greaterThanOrEquals(currentTime, viewer.clock.stopTime)) {
-          viewer.entities.remove(highlightEntity);
-        }
-        return positions;
+            if (Cesium.JulianDate.greaterThanOrEquals(currentTime, end)) {
+              viewer.entities.remove(highlightEntity);
+              return [];
+            }
+
+            for (let i = 0; i < waypoints.length; i++) {
+              let sampleTime = Cesium.JulianDate.addSeconds(start, i, new Cesium.JulianDate());
+              if (Cesium.JulianDate.lessThanOrEquals(sampleTime, currentTime)) {
+                let wp = waypoints[i];
+                let altOffset = offsetAlt;
+                if (i > changeTime) altOffset = offsetAlt2;
+                if (i === changeTime + 1) altOffset = (offsetAlt + offsetAlt2) / 2;
+                positions.push(
+                  Cesium.Cartesian3.fromDegrees(
+                    wp.lng,
+                    wp.lat,
+                    wp.alt + altOffset + offsetArray[i]
+                  )
+                );
+              } else break;
+            }
+
+            return positions;
+          } catch (e) {
+            console.error(e);
+          }
       }, false),
       material: color.withAlpha(0.9),
-      width: 2,
+      width: 1,
       clampToGround: false,
     },
   });
@@ -238,6 +271,6 @@ export function openDroneWindow(mainViewer: Cesium.Viewer, drone: any) {
         clearInterval(intervalId);
         win.close();
       }
-    } catch (error) {}
+    } catch (error) { }
   });
 }

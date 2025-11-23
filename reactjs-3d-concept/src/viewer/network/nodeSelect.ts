@@ -5,7 +5,8 @@ import {
   setCameraFollowDrone,
   openDroneWindow,
 } from "/src/viewer/uav/droneManager";
-import { highlightRoute } from "./pathDrawer.js";
+import { DRONE_MODEL_1, DRONE_MODEL_2 , COLLISION_DISTANCE_THRESHOLD, COLLISION_HEIGHT_OFFSET} from "/src/constants";
+import { highlightRoute } from "/src/viewer/network/pathDrawer";
 
 let warningEntity: Cesium.Entity | null = null;
 let blinkInterval: number | null = null;
@@ -48,7 +49,7 @@ export function enableNodeSelection(viewer: Cesium.Viewer) {
         // Tạo drone A
         const droneA = createDrone(
           viewer,
-          "./assets/models/drone1.glb",
+          DRONE_MODEL_1,
           Cesium.Color.RED,
           nodeMap[startId],
           nodeMap,
@@ -61,7 +62,7 @@ export function enableNodeSelection(viewer: Cesium.Viewer) {
         setTimeout(() => {
           const droneB = createDrone(
             viewer,
-            "./assets/models/drone2.glb",
+            DRONE_MODEL_2,
             Cesium.Color.PURPLE,
             nodeMap[endId],
             nodeMap,
@@ -77,7 +78,7 @@ export function enableNodeSelection(viewer: Cesium.Viewer) {
           );
 
           // Tạo cảnh báo va chạm
-          createCollisionWarning(viewer);
+          const collisionWarning = createCollisionWarning(viewer);
 
           // Theo dõi khoảng cách 2 drone
           viewer.clock.onTick.addEventListener(() => {
@@ -91,7 +92,7 @@ export function enableNodeSelection(viewer: Cesium.Viewer) {
             const d = Cesium.Cartesian3.distance(posA, posB);
             if (d < 50) {
               const mid = interpolate(posA, posB, 0.5);
-              showCollisionWarning(viewer, mid);
+              showCollisionWarning(viewer, collisionWarning, mid);
             } else {
               hideCollisionWarning(viewer);
             }
@@ -109,6 +110,104 @@ export function enableNodeSelection(viewer: Cesium.Viewer) {
       openDroneWindow(viewer, drone);
     }
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
+
+export async function startScenario(viewer: Cesium.Viewer, timerDisplay: HTMLElement) {
+  // nodes to simulate (kept as in original code)
+  const selectedNodes = ["VMC", "TTTC"];
+
+  // safety: ensure window.__network exists
+  if (!window.__network) {
+    console.warn("window.__network chưa được khởi tạo.");
+    return;
+  }
+  const { nodeMap, routes } = window.__network;
+
+  const [startId, endId] = selectedNodes;
+  const waypoints = findWaypoints(routes, startId, endId);
+  if (!waypoints || waypoints.length <= 1) {
+    console.warn("⚠️ Không tìm thấy đường đi giữa", startId, endId);
+    return;
+  }
+
+  const reverseWaypoints = waypoints.slice().reverse();
+
+  // Tạo drone A
+  const droneA = createDrone(
+    viewer,
+    DRONE_MODEL_1,
+    Cesium.Color.RED,
+    nodeMap[startId],
+    nodeMap,
+    0
+  );
+
+  const startScenarioTime = Date.now();
+
+  // Bay droneA
+  animateDroneAlongPath(viewer, droneA, waypoints, Cesium.Color.RED, 0, 0);
+
+  // tạo collision warning entity (ẩn theo mặc định)
+  const collisionWarning = createCollisionWarning(viewer);
+
+  // tick handler: check positions, show/hide warning, update timer
+  const removeTickListener = viewer.clock.onTick.addEventListener(() => {
+    try {
+      const elapsedSec = Math.floor((Date.now() - startScenarioTime) / 1000);
+      const positionDroneA = getDronePosition(viewer, droneA);
+      // droneB chưa sinh => undefined
+      const positionDroneB = getDronePosition(viewer, /* may be undefined */ (window as any).__tmpDroneB);
+
+      // nếu có cả 2 drone -> check khoảng cách
+      if (positionDroneA && positionDroneB) {
+        const d = distance(positionDroneA, positionDroneB);
+        // chỉ báo động sau 20s như logic gốc
+        if (d < COLLISION_DISTANCE_THRESHOLD && elapsedSec > 20) {
+          const midPos = interpolate(positionDroneA, positionDroneB, 0.5);
+          showCollisionWarning(viewer, collisionWarning, midPos);
+        } else {
+          hideCollisionWarning(viewer);
+        }
+      } else {
+        // nếu một trong hai không có vị trí, ẩn cảnh báo
+        hideCollisionWarning(viewer);
+      }
+
+      // update timer display
+      timerDisplay.textContent = positionDroneA || positionDroneB ? `Thời gian: ${elapsedSec}s` : "Hoàn thành";
+
+      // nếu cả hai drone đều không có vị trí (kết thúc), dừng tick listener
+      if (!positionDroneA && !positionDroneB) {
+        // dừng đồng hồ animation (nếu muốn)
+        viewer.clock.shouldAnimate = false;
+        // remove tick listener
+        try {
+          // addEventListener trả về remover function; remove nó nếu có
+          if (typeof removeTickListener === "function") removeTickListener();
+        } catch (e) {}
+      }
+    } catch (err) {
+      console.error("Error in scenario tick:", err);
+    }
+  });
+
+  // đợi 5s rồi tạo droneB (giữ logic giống bản gốc)
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
+  // tạo drone B
+  const droneB = createDrone(
+    viewer,
+    DRONE_MODEL_2,
+    Cesium.Color.PURPLE,
+    nodeMap[endId],
+    nodeMap,
+    0
+  );
+
+  // store reference so the tick handler can read it (local-scope; we avoid globals by attaching to window under temp key)
+  (window as any).__tmpDroneB = droneB;
+
+  animateDroneAlongPath(viewer, droneB, reverseWaypoints, Cesium.Color.PURPLE, 0, 10);
 }
 
 // =========================
@@ -130,12 +229,13 @@ function createCollisionWarning(viewer: Cesium.Viewer) {
     },
     show: false,
   });
+  return warningEntity
 }
 
-function showCollisionWarning(viewer: Cesium.Viewer, midPos: Cesium.Cartesian3) {
+function showCollisionWarning(viewer: Cesium.Viewer, warningEntity: Cesium.Entity | undefined, midPos: Cesium.Cartesian3) {
   if (!warningEntity) return;
 
-  warningEntity.position = new Cesium.ConstantPositionProperty(getElevatedPosition(midPos, 5));
+  warningEntity.position = new Cesium.ConstantPositionProperty(getElevatedPosition(midPos, COLLISION_HEIGHT_OFFSET));
   warningEntity.show = true;
 
   if (blinkInterval) return; // đã chạy
@@ -179,6 +279,11 @@ function getElevatedPosition(cartesian: Cesium.Cartesian3, heightOffset = 50) {
   const carto = Cesium.Cartographic.fromCartesian(cartesian);
   carto.height += heightOffset;
   return Cesium.Cartesian3.fromRadians(carto.longitude, carto.latitude, carto.height);
+}
+
+// Hàm tính khoảng cách giữa 2 point Cartesian
+function distance(c1: Cesium.Cartesian3, c2: Cesium.Cartesian3) {
+  return Cesium.Cartesian3.distance(c1, c2);
 }
 
 function findWaypoints(routes: any[], a: string, b: string) {

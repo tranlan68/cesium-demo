@@ -13,12 +13,12 @@ export function getBuildingColor(
   buildingColour: string | undefined,
   height: number
 ): string {
-  let color = "#999999"; // mặc định
+  let color = "#b8b6b6ff"; // mặc định
 
   if (building === "yes" || building === "apartments") {
-    if (height < 10) color = "#b3e6b3"; // thấp tầng
-    else if (height < 25) color = "#ffd966"; // trung tầng
-    else color = "#ff9999"; // cao tầng
+    //if (height < 10) color = "#b3e6b3"; // thấp tầng
+    //else if (height < 25) color = "#ffd966"; // trung tầng
+    //else color = "#ff9999"; // cao tầng
   } else if (building === "university") color = "#ffc04d";
   else if (building === "dormitory") color = "#ffe680";
   else if (building === "canteen") color = "#ff9999";
